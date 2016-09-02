@@ -1,0 +1,158 @@
+---
+title: "Dergulated Energy Markets in the US"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+In this post I am going to further explore the relationship between energy prices in states with deregulated energy markets and those with fully regulated energy markets. 
+
+As I outlined in the last post, many states chose to deregulate their energy markets starting in the mid 90s, breaking up the utilities' monopolies and introducing competition to the market. In those states, new companies could sell electricity or gas directly to consumers, while the utility handled the distribution. A big selling point when passing laws to bring deregulation about was that the increased competition would benefit consumers by driving prices down, but did that really happen? I will be exploring that question in this post.
+
+Skip to The Analysis and The Summary for the interesting stuff.
+
+###The Data
+
+To start it off, this is the code to load the [EIA data](http://www.eia.gov/electricity/sales_revenue_price/) ("1990 - 2013 Average Price by State by Provider" ) from a saved .xls file on your computer. The file contains annual energy price data for every state between 1990 and 2014 for different types of customers and different suppliers (discussed in detail in the previous post).
+
+First, the packages:
+```{r message=F, warning=F, error=F}
+library(readxl)
+library(XML)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(data.table)
+library(ggthemes)
+library(maps)
+library(rmarkdown)
+```
+Load it in...
+
+```{r message=F, warning=F, error=F, results='hide'}
+priceYear <- read_excel("C:/Users/tmo/Desktop/R/priceannualenergy.xls", skip=1)
+```
+
+...in this format:
+```{r}
+head(priceYear)
+```
+
+Use `dplyr` to go from a *wide* dataset to a *long* dataset
+```{r}
+priceYear <- gather(priceYear, Sector, Price, -c(Year, State, `Industry Sector Category`))
+```
+
+Make it a `data.table`, add a variable for region, rename the columns, take out the `na`s and the observations that appear to be mistakes (eg price/kWh of $160)...
+```{r warning=F}
+priceYear<-data.table(priceYear)
+  MW<-c("IL","OH","WI","ND","SD","NE","KS","IA","MN","IN","MO","MI")
+  W<-c("AZ","CO","ID","MT","NV","NM","UT","WY","AK","CA","HI","OR","WA")
+  S<-c("AL","KY","MS","TN","AR","LA","OK","TX","DE","FL","GA","MD","NC","SC","VA","WV", "DC")
+  NE<-c("CT","ME","MA","NH","RI","VT","NJ","NY","PA")
+priceYear[, Region := ifelse(State%in%MW, "Midwest", ifelse(State%in%W, "West", ifelse(
+  State%in%S, "South", ifelse(State%in%NE, "Northeast", "US"))))]
+rm(MW,W,S,NE)
+names(priceYear)<-c("Year","State","Industry","Sector","Price","Region")
+priceYear$Price<-as.numeric(priceYear$Price)
+priceYear<-filter(priceYear, Price<40)
+priceYear<-na.omit(priceYear)
+priceYear<-filter(priceYear, Price!="NA")
+```
+ 
+ And finally, add a column to differentiate which states have deregulated energy markets. I am using information from [this page from the EIA](http://www.eia.gov/electricity/policies/restructuring/restructure_elect.html) which is from 2010, cross referenced with [this information](http://competitiveenergy.org/consumer-tools/state-by-state-links/) from the American Coalition of Competitive Energy Suppliers, date unknown. I am including only the states that deregulated and stayed that way (some states...*un*-deregulated? *De*-deregulated? Went back).
+
+```{r}
+dereg<- c("OR",
+          "TX","MD","DC","DE",
+          "IL","MI","OH",
+          "NJ","NY","CT","RI","MA","NH","ME","PA")
+priceYear[, Deregulated := ifelse(State %in% dereg, T, F)] #creat 'Dereg' column for deregulated states
+setkey(priceYear, Year) 
+head(priceYear)
+```
+
+###The Analysis
+
+To kick off the analysis, I created a new `data.table`, `totals`, containing the average price of energy by `Year`, `Industry`, `Sector`, and `Deregulated`. I'm using `data.table` subsetting to simultaneously exclude the data for the whole US (`Region!="US"`) and create the new column `MeanPrice`.
+```{r}
+totals<-priceYear[Region!="US", .(MeanPrice=mean(Price)), by=.(Year, Industry, Sector, Deregulated)]
+head(totals)
+```
+
+Using `totals`, I can compare the average price in all deregulated states (dotted lines) vs. the average price in all the other states (unbroken lines). I have removed the `Sector` observations for `Other` and `Transportation` because they contained incomplete data. Fun theme courtesy of the `ggthemes` package.
+
+```{r fig.width=10.5, fig.height=7.5}
+t<-c("Commercial","Industrial","Residential","Total")
+ggplot(totals[Sector %in% t & Industry=="Total Electric Industry"], 
+       aes(x=Year, y=MeanPrice, col=Sector, linetype=Deregulated)) +
+  geom_line() +
+  ggtitle("Average Energy Prices, 1990-2014") + ylab("Price (cents/kWh)") +
+  theme_solarized(light=F)
+```
+  
+According to the data, the average price for electricity in deregulated states was higher for every consumer type in every year that we have data. That doesn't seem like a great endorsement, but I'm not ready to reject energy deregulation just yet. In fact, there is an obvious problem with this basic representation of the data: it does not show *when* energy deregulation came into effect.
+
+Of the 16 states I have tagged as deregulated, they all made the change to their energy markets sometime between 1995 and 2010; in 1990, no states had deregulated energy markets, so deregulation had nothing to do with their otherwise higher-on-average energy prices. Let's look at how much higher prices were in 1990 and 2014 in states that *eventually* adopted deregulation compared to states that didn't.
+
+
+
+To have a closer look at the price difference between deregulated and normal states, I continued with the `totals` dataset. To refresh:
+
+```{r}
+head(totals)
+```
+As you can see, the first two rows have the same `Year`, `Industry`, and `Sector`, but for deregulated states in row 2 and normal states in row 1. This pattern repeats for every `Year`/`Industry`/`Sector` combination. Knowing that, I can calculate the price percent difference for each  `Year`/`Industry`/`Sector` combo by subtracting the normal price from the deregulated price and dividing by the regular price.
+
+I accomplished this using `shift()` from `data.table`. In my code below, I am grouping by `Year`/`Industry`/`Sector`, of which there are two observations per grouping. For each observation in that grouping of two, it is taking `MeanPrice` and subtracting and dividing by the prior observation's `MeanPrice` using `shift()`. Since the first observation in each grouping doesn't have a prior, it comes up `NA`, and I remove those rows with `na.omit`.
+
+```{r fig.width=10.5, fig.height=7.5}
+totals2<-totals[Industry=="Total Electric Industry", .((MeanPrice-shift(MeanPrice))/shift(MeanPrice)), by=.(Year, Industry, Sector)]
+
+totals2<-na.omit(totals2)
+totals2$V1 <- totals2$V1*100
+ggplot(totals2[Sector%in%t], aes(x=Year, y=V1, col=Sector))+
+  geom_line() +
+  ggtitle("Price Difference in Deregulated States") + ylab("Percent Difference") +
+  theme_solarized() +
+  theme(panel.grid.major.y = element_line(color = "black"))
+
+```
+
+###The Summary
+
+Wow. In 1990, prices across all sectors in states that *eventually* deregulated (and stayed that way) were between 20 and 30 percent higher than prices in other states. The deregulated prices surged comparatively between 2005 and 2010 but then dropped to record close prices in 2012 and 2013 and stayed low into 2014, across all sectors.This means that between 1990 and 2014 the average electricity price across all sectors rose more in states that did not deregulate compared to those that did
+
+Looking at both graphs simultaneously is revealing. We see the big jump in prices in 2004, but by 2008 the deregulated prices flatten out for the next six years or decrease, while the other states' prices continue to rise at a steady rate. Since prices are not controlled in deregulated states, the companies are able to adjust their prices according to market conditions whereas utilities have strict controls as to how and when they can raise prices.
+
+So, in regulated states
+
+* Prices won't jump up unexpectedly but...
+* They probably won't go down even if energy gets cheaper to produce (because utilities don't have to compete for your business)
+
+Intuitive but cool to see the hard data.
+
+
+```{r echo=F, fig.width=5, fig.height=3}
+ggplot(totals[Sector %in% t & Industry=="Total Electric Industry"], 
+       aes(x=Year, y=MeanPrice, col=Sector, linetype=Deregulated)) +
+  geom_line() +
+  ggtitle("Average Energy Prices, 1990-2014") + ylab("Price (cents/kWh)") +
+  theme_solarized(light=F)
+ggplot(totals2[Sector%in%t], aes(x=Year, y=V1, col=Sector))+
+  geom_line() +
+  ggtitle("Price Difference in Deregulated States") + ylab("Percent Difference") +
+  theme_solarized() +
+  theme(panel.grid.major.y = element_line(color = "black"))
+```
+
+
+Fun stuff. For the next post I will look at deregulation in some state-by-state cases.
+
+
+
+
+
