@@ -9,18 +9,12 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Some fun GitHub practice
+I can easily change the contents of this webpage by saving the rmarkdown file on my computer in the GitHub repo, knitting it to HTML, then syncing my local repository with the remote repository where this page is hosted.
 
 ```{r cars}
-summary(cars)
+library(ggplot2)
+
+ggplot(data.frame(a=1:10, b=rnorm(10, mean=4)), aes(x=a, y=b)) +
+  geom_bar(stat="identity") +
+  ggtitle("A plot")
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
