@@ -1,0 +1,139 @@
+---
+title: "Untitled"
+author: "T Morrison"
+date: "September 2, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev='CairoPNG')
+```
+
+
+In this post, I am going to be doing some data visualization with data on energy production in the United States from 1990 to 2014. The data comes courtesy of the Energy Information Administration (specifically here under "Net Generation by State by Type of Producer by Energy Source"). They have a lot of interesting data available I will certainly be exploring in the future.
+
+```{r, message=FALSE, warning=FALSE}
+library(readxl)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(data.table)
+library(ggthemes)
+```
+
+
+The original .xls file has over 40,000 rows of data in five columns:
+
+For every year and every state, there is generation energy data for fourteen methods of production (coal, wind, natural gas, etc.) and six types of energy producers. Today, I wanted to look at just the total production by source, so I needed to do some data cleaning to end up with a workable data set.
+
+First, I loaded in the .xls file using `read_excel()` from the `readxl` package, which automatically loads it as a tbl_df for use with dplyr.
+
+```{r, eval=FALSE, include=TRUE}
+GenerationByState<- read_excel("C:/Users/tmo/Desktop/R/energygenerationbystate.xls", skip=1)
+names(GenerationByState) <- c("Year","State","Producer","Source","Mwhs")
+```
+
+```{r, eval=TRUE, include=FALSE}
+GenerationByState<- read_excel("C:/Users/tmo/Desktop/R/energygenerationbystate.xls", skip=1)
+names(GenerationByState) <- c("Year","State","Producer","Source","Mwhs")
+```
+
+
+Then using `filter()`, I broke that parent data set into four smaller ones with only the "Total Electric Power Industry" producer type, according to the U.S. Census Bureau-defined regions: Midwest, Northeast, South, and West.
+
+```{r}
+State <- filter(GenerationByState, Producer=="Total Electric Power Industry")
+
+Midwest <- filter(GenerationByState, State %in% c("IL","OH","WI","ND","SD","NE","KS","IA","MN","IN","MO","MI"))
+Northeast <- filter(GenerationByState, State %in% c("CT","ME","MA","NH","RI","VT","NJ","NY","PA"))
+West <- filter(GenerationByState, State %in% c("AZ","CO","ID","MT","NV","NM","UT","WY","AK","CA","HI","OR","WA"))
+South <- filter(GenerationByState, State %in% c("AL","KY","MS","TN","AR","LA","OK","TX","DE","FL","GA","MD","NC","SC","VA","WV", "DC"))
+
+tepiMW <- filter(Midwest, Producer=="Total Electric Power Industry")
+tepiNE <- filter(Northeast, Producer=="Total Electric Power Industry")
+tepiW <- filter(West, Producer=="Total Electric Power Industry")
+tepiS <- filter(South, Producer=="Total Electric Power Industry")
+```
+
+These data sets are good for comparing state by state production within a region, but I wanted to have a look region by region first. In order to do that, I needed to get the sum total energy production by source for each year within the region, i.e. adding each state's production by type and year for the entire region.
+
+The easiest solution for me lay within the data.table package. After converting my regional data sets to data.tables, I used the powerful subsetting functionality of the package to add "Mwhs" for each source by year.
+
+```{r}
+function2 <- function(df) {
+              x <- data.table(df)
+              y<-x[,.(SourceSum=sum(Mwhs), Region=Region), by=.(Source, Year)]
+              y
+}
+
+tepiMW$Region <- "MW"
+tepiS$Region <- "S"
+tepiNE$Region <- "NE"
+tepiW$Region <- "W"
+
+list <- list(tepiMW,tepiNE,tepiW,tepiS)
+list2 <- lapply(list, function2)
+```
+
+The second line of the above function takes the existing data.table (x) and creates a new data.table with the columns SourceSum, Source, and Year. SourceSum is defined by the sum of Mwhs by Year and Source. So, for every observation with the same Year and Source, the Mwhs variable is added and creates a new observation with the same Year and Source, but now there is no State variable. I used `lapply` to perform the function on each dataset in a list. The resulting data.table (I also added a Region variable):
+
+```{r}
+head(list2[2])
+```
+
+
+I then combined the four regional data.tables into one data.table with the unique Region variable to differentiate between the regions.
+
+```{r}
+TotalsRegion<-rbind(list2[[1]], list2[[2]], list2[[3]], list2[[4]])
+```
+
+
+Using the following function, I turned the Year variable into Date class in a new column, Date:
+
+```{r}
+
+
+```
+
+By concatenating the Year variable (e.g. 1990) with "01-01" and no separator, the resulting string "1990-01-01" could be converted correctly to Date type.
+
+Now for the plot.
+
+```{r, fig.width=10}
+ggplot(TotalsRegion, aes(x=Year, y=SourceSum, col=Source)) +
+  geom_line(size=.6) +
+  facet_grid(.~Region) +
+  ggtitle("Energy Production in the United States") + xlab("Year") + ylab("Energy Production in Mwhs") +
+  theme_solarized(light=F) + theme(panel.margin.x=unit(20,"pt"))
+```
+
+
+Thoughts (keeping in mind this is energy production by region, not necessarily consumption):
+
+  * Coal as a source of energy has been declining since about 2005 and is back down to, or below, mid-90s levels.
+  * Nuclear capacity has not changed
+  * Natural gas looks to have picked up a lot of slack from the decline in coal
+  * Wind has grown steadily in most regions since 2005/2006
+  * Natural gas use for energy production was on the rise before what most people know as the fracking explosion of the late 00s
+  * Total energy production increased until about 2009 and has stayed flat since then
+
+How about a look at just the renewable sources of energy? Note the different scale on the y-axis as well as the changes to the legend.
+
+```{r, fig.width=10}
+renewables<-c("Hydroelectric Conventional","Geothermal","Other Biomass","Solar Thermal and Photovoltaic","Wind","Wood and Wood Derived Fuels")
+
+ggplot(filter(TotalsRegion, Source%in%renewables), aes(x=Year, y=SourceSum, col=Source)) +
+  geom_line(size=.6) +
+  facet_grid(.~Region) +
+  ggtitle("Renewable Energy Production, United States") + xlab("Year") + ylab("Energy Production in Mwhs") +
+  theme_solarized(light=F) + theme(panel.margin.x=unit(20,"pt"))
+```
+
+* Big jumps in wind in around 2006/2007 and steady growth since then. The recent extension of the Production Tax * * * Credit for wind should see this continue to grow as a share of the energy market
+* Hydroelectric capacity looks to have been maxed out by 1990 and has remained flat over this time frame, getting * passed by wind in the Midwest and the South. Sporadic droughts in the West probably have a lot to do with the big jumps in that region.
+* Solar gets a lot of press, but is nowhere near wind capacity anywhere
+* They're burning wood in the South. Maybe all the barbecuing.
+
+Up next I'll take a deeper look at energy production in the US and pull in some more data sets from the EIA and maybe other economic and demographic data.
+
