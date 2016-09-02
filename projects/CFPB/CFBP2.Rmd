@@ -1,0 +1,99 @@
+---
+title: "CFPB Mortgage Complaints"
+author: "T. Morrison"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Continuing with the CFPB data from the previous post, I am going to look at the mortgage complaints a bit more closely.
+
+```{r error=F, message=FALSE, warning=FALSE, include=FALSE}
+library(RSQLite)
+library(DBI)
+library(ggplot2)
+library(data.table)
+library(ggthemes)
+library(scales)
+
+con <- dbConnect(SQLite(), "C:/sqlite/kaggle1.sqlite")
+x<- data.table(dbReadTable(con, "consumer_complaints"))
+x$date_received <- as.Date(x$date_received, format="%m/%d/%Y")
+```
+
+Starting off this script, I have put together a density plot to see the frequency of complaints for each type of product over the entire dataset. The y-scale varies for each faceted plot. Each bar represents 30 days worth of complaints.
+
+```{r fig.width=10, fig.align='center'}
+ggplot(x, aes(x=date_received)) +
+  geom_histogram(aes(y=..count..), color="black", binwidth=30, position="identity", fill="gray") +
+  facet_wrap(~product, scales="free_y") +
+  theme_tufte() +
+  ggtitle("Volume of Complaints by Product") + xlab("") + ylab("")
+```
+
+
+My initial thought was to see whether the frequency of consumer complaints have changed over time, for any product or perhaps company, to see if I could make sense of why that might be or determine whether certain problems are being resolved on a wide scale.
+
+From the above plot, consumer complaints have not fallen off significantly for any product and have increased substantially for consumer loans, money transfers, and credit reporting. 
+
+Since mortgages are arguably the reason that the Consumer Financial Protection Bureau was created (in response to the 07-08 financial crisis caused by the housing market crash, which was driven by defaulting mortgages) and they represent the highest volume of complaints, I am going to focus on them in this script.
+
+```{r fig.align='center'}
+ggplot(x[product=="Mortgage"], aes(x=date_received)) +
+  geom_histogram(aes(y=..count..), color="black", binwidth=30, position="identity", fill="grey") +
+  geom_line(aes(y=30*..count..), stat="density", color="black", size=.8, alpha=.8) +
+  theme_tufte() +
+  ggtitle("Volume of Mortgage Complaints") + xlab("") + ylab("")
+```
+
+Mortgage complaints have averaged around 3500 or so a month for the last four years, peaking in the early months and dropping off at the end of the year.
+
+What issues are people having with mortgages and how have complaints about those changed?
+
+```{r fig.width=10, fig.align='center'}
+ggplot(x[product=="Mortgage"], aes(date_received)) +
+  geom_histogram(aes(y=..count..), binwidth=30, col="black", fill="grey") +
+  facet_wrap(~issue) +
+  theme_tufte() +
+  ggtitle("Volume of Mortgage Complaints by Issue") + xlab("") + ylab("")
+  
+```
+
+The two biggest issues, complaints about loan servicing, payments, and escrow accounts have been rising steadily since 2012 while complaints about loan modification, collection, and foreclosure have been falling since 2013. 
+
+A closer look at these two issues.
+
+```{r fig.width=10, fig.align='center'}
+ggplot(x[product=="Mortgage" & issue %in% c("Loan modification,collection,foreclosure", "Loan servicing, payments, escrow account")], aes(date_received)) +
+  geom_histogram(aes(y=..count..), binwidth=30, col="black", fill="grey") +
+  facet_wrap(~issue) +
+  theme_tufte() +
+  ggtitle("Volume of Mortgage Complaints by Issue") + xlab("") + ylab("")
+```
+
+By looking at how consumers and financial institutions responded to complaints over time, we may be able to get an idea of whether issues are being resolved better in the mortgage industry.
+
+This chart shows the fraction of company responses disputed by consumers in the two major complaint areas for mortgages. I am assuming that if a consumer does not dispute the company's response, they are satisfied.
+
+```{r fig.width=10, fig.align='center'}
+ggplot(x[product=="Mortgage" & issue %in% c("Loan modification,collection,foreclosure", "Loan servicing, payments, escrow account")], aes(date_received, fill=consumer_disputed.)) +
+  geom_histogram(aes(y=..count..), binwidth=30, position="fill") +
+  facet_wrap(~issue) +
+  theme_tufte() +
+  ggtitle("Fraction of Disputed Mortgage Complaints") + xlab("") + ylab("")
+```
+
+Relatively constant rates of consumer disputes don't indicate a major improvement in responses to mortgage complaints for these two issues.
+
+However, the overall downward trend in mortgage complaints is a good sign of improvement in the industry and the significant drop in complaints relating to foreclosures, the most serious issue a consumer can have with their mortgage, is very good and a trend one hopes will continue.
+
+
+
+
+
+
+
+
+
