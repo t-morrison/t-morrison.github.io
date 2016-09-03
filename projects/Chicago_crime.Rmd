@@ -1,0 +1,183 @@
+---
+title: "Chicago Crime Data"
+author: "T Morrison"
+date: "August 5, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE }
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(data.table)
+library(ggplot2)
+library(Cairo)
+library(httr)
+library(ggthemes)
+library(maptools)
+library(ggmap)
+#rmarkdown::render("blogCrime.Rmd")
+```
+
+In this post, I am exploring City of Chicago open crime data portal data, found [here](https://data.cityofchicago.org/Public-Safety/Crimes-2001-to-present/ijzp-q8t2).
+
+The full dataset covers every reported crime from 2001 through the present, which numbered about 2.6 million observations at the time of this writing. There was no chance my laptop could handle that large of a dataset, so I used the `httr` package to query the data portal API and load in subsets of the data to my R environment.
+
+For now, I am pulling a subset of all reported crimes with a `WEAPONS VIOLATION` primary type; these are crimes relating to guns, mostly.
+
+```{r, eval=FALSE, include=TRUE}
+gunData <- GET("https://data.cityofchicago.org/resource/6zsd-86xi.csv?primary_type=WEAPONS+VIOLATION")
+guns <- content(gunData)
+setDT(guns)
+guns$date2 <- as.Date(guns$date)
+guns$month <- as.numeric(format(as.Date(guns$date), "%m"))
+guns$day <- as.numeric(format(as.Date(guns$date), "%d"))
+```
+
+I will also be using some shapefiles, from the same Chicago data portal, to map the data by region. To load the shapefiles for each ward in Chicago, I used the `maptools` and `ggplot2` packages.
+
+```{r, eval=FALSE, include=TRUE}
+wardData <- readShapePoly(file.choose())
+ward <- writePolyShape(wardData, fn=" ")
+wardData2 <- fortify(wardData)
+setDT(wardData2)
+
+numWard <- data.table(Old=c(0:49), Actual=c(12,16,15,20,49,23,29,14,3,4,2,35,21,24,13,48,31,47,38,33,30,34,28,                                            40,44,25,50,22,41,18,17,6,5,43,8,42,7,39,46,32,1,19,9,36,37,27,10,11,26,45))
+wardData2$id <- numWard$Actual[match(wardData2$id,numWard$Old)]
+```
+
+And to add a background layer with a satellite image of the Chicago area, I used the `ggmap` package:
+
+```{r, eval=FALSE, include=TRUE}
+mapImage <- get_map(location=c(lon=-87.7, lat=41.8), maptype="satellite", source="google", zoom=10) 
+```
+
+There are 26 variables:
+
+```{r}
+names(guns)
+```
+
+It looks like lots of different location descriptors (`ward`, `block`, `beat`) plus some other important descriptors like `description` and `primary_type` as well as whether there was an arrest made (`arrest`). It is important to note that these are just reported crimes and did not necessarily results in arrests or criminal charges, nor did a crime even necessarily occur.
+
+###Guns Data
+
+The following data is all of `primary_type`=`WEAPONS VIOLATION`. Within the `WEAPONS VIOLATION` variable, there are 15 different subcategories, in the `description` variable:
+
+```{r}
+unique(guns$description)
+```
+
+All of them are related to firearms, except `UNLAWFUL USE OTHER DANG WEAPON`.
+
+One important variable in the dataset is `arrest`. This variable, either `true` or `false`, indicates whether an arrest was made. I'm not sure what happened when an arrest wasn't made, but I will be focusing on only those cases where `arrest` is `true`, which is over 80% of the observations in this subset.
+
+How many arrests were made of each type between 2001 and 2016?
+
+```{r}
+ggplot(guns[arrest=="true", .N, by=.(description)], aes(x=description, y=N)) +
+  geom_bar(stat="identity", fill="indianred") +
+  theme_solarized() +
+  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  ggtitle("Weapons-related Arrests") + ylab("")+ xlab("")
+#1
+```
+
+Since 2001, in Chicago, there have been over 34,000 arrests for unlawful possession of a firearm. The next highest weapon-related offense resulting in arrests is the unlawful use of another type of weapon (besides a firearm). No arrests for `USE OF METAL PIERCING BULLETS`, which is a small relief (unless those guys are just getting away...).
+
+How has the frequency of arrests for unlawful firearm possession changed since 2001?
+```{r}
+ggplot(guns[arrest=="true" & year != 2016 & description=="UNLAWFUL POSS OF HANDGUN"], aes(year)) +
+  geom_bar(fill="indianred") +
+  scale_x_continuous(limits=c(2001,2016), breaks=c(2001:2015)) +
+  theme_solarized() + 
+  ggtitle("Unlawful Handgun Possesion Arrests by Year") + xlab("") + ylab("")
+#2
+
+```
+
+Not much, though 2013/2014/2015 were somewhat lower than the rest of the years.
+
+What about the distribution of firearms-related arrests month to month, since 2001?
+
+```{r}
+ggplot(guns[arrest=="true"], aes(month)) +
+  geom_bar(fill="indianred") +
+  scale_x_continuous(breaks=c(1:12)) +
+  theme_solarized() +
+  ggtitle("Weapons Arrests, Monthly Distribution") + xlab("") + ylab("")
+#3
+```
+
+The peak in the summer months is as expected; there is always increased coverage of gun violence in the summertime in Chicago, it follows that arrests are higher when criminal activity is higher. However, the January jump in-between the two lowest months, December and February, is surprising. There may be some spotty accounting where reported arrests are just tacked on to 1/1 when they don't know for sure where to put it. Let's see:
+
+```{r}
+ggplot(guns[month==1], aes(day)) +
+  geom_bar(fill="indianred") +
+  scale_x_continuous(breaks=c(1:31)) +
+  theme_solarized() +
+  ggtitle("January weapons arrests by day of the month") + xlab("") + ylab("")
+#4
+```
+
+And that appears to be the case. So discounting the January spike, the distribution is as expected.
+
+And where are the weapons-related arrests taking place? Using the shapefiles loaded from before, we can see the distribution of arrests by ward. The background layer is added using the `ggmap` package.
+
+```{r, eval=T}
+ggmap(mapImage) +
+  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill=NA, col="black") +
+  geom_map(data=guns[arrest=="true" & !is.na(ward), .N, by=ward], map=wardData2,
+           aes(map_id=ward, fill=N),
+           alpha=.7, inherit.aes=F) +
+  scale_fill_continuous(high="red", low="yellow") +
+  ggtitle("Weapons-related arrests by ward, 2001-2016") + xlab("") + ylab("")
+#5
+```
+
+Unfortunately, over 4,500 of the reported arrests have `NA` listed for `ward`. Still, we do get a good sense of where gun crimes are taking place: in the west and southwest parts of the city.
+
+Luckily, the dataset also contains coordinates of the arrests, and only about 400 are missing these variables. Using the coordinates in place of the ward identifiers gives a clearer picture of where weapons-related arrests are taking- and where they aren't. Each point on the map represents one arrest between 2001 and July 2016.
+
+```{r, echo=TRUE, message=TRUE, warning=TRUE}
+ggmap(mapImage) +
+  #geom_point(data=guns[latitude>40], aes(x=longitude, y=latitude), col="indianred", size=.1, fill=NA, alpha=.3) +
+  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill="grey", alpha=.5, col="black", size=.7) +
+  geom_point(data=guns[arrest=="true"], aes(x=longitude, y=latitude), col="black", size=.1, fill=NA, alpha=.3) +
+  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill=NA, col="black", size=.7) +
+  scale_y_continuous(limits=c(41.6, 42.05), expand=c(0,0)) + scale_x_continuous(limits=c(-88,-87.5)) +
+  ggtitle("Weapons related arrests, 2001-2016") + xlab("") + ylab("")
+#6
+```
+
+Interestingly there is a concentration in the far northeast corner of the city, near the border with Evanston.
+
+Next, let's look at how the geographical distribution of arrests changed between 2001 and 2015. In 2001 there were 3,537 weapons-related arrests in Chicago and in 2015 there were 2,658 I've made the points bigger since there are fewer instances than the previous map, but each still represents one arrest.
+
+```{r, echo=TRUE, message=TRUE, warning=TRUE}
+ggmap(mapImage) +
+  #geom_point(data=guns[latitude>40], aes(x=longitude, y=latitude), col="indianred", size=.1, fill=NA, alpha=.3) +
+  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill="grey", alpha=.65, col="black", size=.7) +
+  geom_point(data=guns[arrest=="true" & year %in% c(2001,2015)], aes(x=longitude, y=latitude), col="black", fill=NA, alpha=.3) +
+  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill=NA, col="black", size=.7) +
+  scale_y_continuous(limits=c(41.6, 42.05), expand=c(0,0)) + scale_x_continuous(limits=c(-88,-87.5)) +
+  ggtitle("Weapons related arrests, 2001 & 2015") + xlab("") + ylab("") +
+  facet_wrap(~year)
+#7
+```
+
+
+There were definitely fewer arrests in 2015, especially towards the far northeast and north-central parts of the city. Unfortunately, the South Side has nearly the exact same pattern of weapons-related arrests, and, presumably, gun violence.
+
+That's all for now. Next time I will look into doing some predictive analytics with some of the variables.
+
+
+
+
+
+
+
+
+
+
