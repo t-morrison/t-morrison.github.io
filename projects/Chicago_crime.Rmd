@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE }
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, dev='CairoPNG')
 ```
 
 ```{r, include=FALSE}
@@ -17,7 +17,7 @@ library(httr)
 library(ggthemes)
 library(maptools)
 library(ggmap)
-#rmarkdown::render("blogCrime.Rmd")
+#rmarkdown::render("C:/Users/tmo/Documents/Github/moman822.github.io/projects/Chicago_crime.Rmd")
 ```
 
 In this post, I am exploring City of Chicago open crime data portal data, found [here](https://data.cityofchicago.org/Public-Safety/Crimes-2001-to-present/ijzp-q8t2).
@@ -144,10 +144,10 @@ Luckily, the dataset also contains coordinates of the arrests, and only about 40
 ggmap(mapImage) +
   #geom_point(data=guns[latitude>40], aes(x=longitude, y=latitude), col="indianred", size=.1, fill=NA, alpha=.3) +
   geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill="grey", alpha=.5, col="black", size=.7) +
-  geom_point(data=guns[arrest=="true"], aes(x=longitude, y=latitude), col="black", size=.1, fill=NA, alpha=.3) +
+  geom_point(data=guns[arrest=="true"], aes(x=longitude, y=latitude), col="goldenrod4", size=.1, fill=NA, alpha=.5) +
   geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill=NA, col="black", size=.7) +
   scale_y_continuous(limits=c(41.6, 42.05), expand=c(0,0)) + scale_x_continuous(limits=c(-88,-87.5)) +
-  ggtitle("Weapons related arrests, 2001-2016") + xlab("") + ylab("")
+  ggtitle("Weapons related arrests, 2001-2016") + xlab("") + ylab("") + theme_map()
 #6
 ```
 
@@ -163,7 +163,7 @@ ggmap(mapImage) +
   geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill=NA, col="black", size=.7) +
   scale_y_continuous(limits=c(41.6, 42.05), expand=c(0,0)) + scale_x_continuous(limits=c(-88,-87.5)) +
   ggtitle("Weapons related arrests, 2001 & 2015") + xlab("") + ylab("") +
-  facet_wrap(~year)
+  facet_wrap(~year) + theme_map() + theme(panel.margin.x=unit(15, "pt"))
 #7
 ```
 
