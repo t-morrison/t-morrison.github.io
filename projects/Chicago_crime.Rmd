@@ -125,7 +125,7 @@ And that appears to be the case. So discounting the January spike, the distribut
 
 And where are the weapons-related arrests taking place? Using the shapefiles loaded from before, we can see the distribution of arrests by ward. The background layer is added using the `ggmap` package.
 
-```{r, eval=T}
+```{r, eval=T, message=FALSE, warning=FALSE}
 ggmap(mapImage) +
   geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill=NA, col="black") +
   geom_map(data=guns[arrest=="true" & !is.na(ward), .N, by=ward], map=wardData2,
@@ -140,12 +140,12 @@ Unfortunately, over 4,500 of the reported arrests have `NA` listed for `ward`. S
 
 Luckily, the dataset also contains coordinates of the arrests, and only about 400 are missing these variables. Using the coordinates in place of the ward identifiers gives a clearer picture of where weapons-related arrests are taking- and where they aren't. Each point on the map represents one arrest between 2001 and July 2016.
 
-```{r, echo=TRUE, message=TRUE, warning=TRUE}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 ggmap(mapImage) +
   #geom_point(data=guns[latitude>40], aes(x=longitude, y=latitude), col="indianred", size=.1, fill=NA, alpha=.3) +
-  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill="grey", alpha=.5, col="black", size=.7) +
-  geom_point(data=guns[arrest=="true"], aes(x=longitude, y=latitude), col="goldenrod4", size=.1, fill=NA, alpha=.5) +
-  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill=NA, col="black", size=.7) +
+  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill="grey", alpha=.5, col="black", size=.4) +
+  geom_point(data=guns[arrest=="true"], aes(x=longitude, y=latitude), col="black", size=.1, fill=NA, alpha=.5) +
+  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill=NA, col="black", size=.4) +
   scale_y_continuous(limits=c(41.6, 42.05), expand=c(0,0)) + scale_x_continuous(limits=c(-88,-87.5)) +
   ggtitle("Weapons related arrests, 2001-2016") + xlab("") + ylab("") + theme_map()
 #6
@@ -155,12 +155,12 @@ Interestingly there is a concentration in the far northeast corner of the city, 
 
 Next, let's look at how the geographical distribution of arrests changed between 2001 and 2015. In 2001 there were 3,537 weapons-related arrests in Chicago and in 2015 there were 2,658 I've made the points bigger since there are fewer instances than the previous map, but each still represents one arrest.
 
-```{r, echo=TRUE, message=TRUE, warning=TRUE}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 ggmap(mapImage) +
   #geom_point(data=guns[latitude>40], aes(x=longitude, y=latitude), col="indianred", size=.1, fill=NA, alpha=.3) +
-  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill="grey", alpha=.65, col="black", size=.7) +
-  geom_point(data=guns[arrest=="true" & year %in% c(2001,2015)], aes(x=longitude, y=latitude), col="black", fill=NA, alpha=.3) +
-  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill=NA, col="black", size=.7) +
+  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill="grey", alpha=.55, size=.3, col="black", size=.7) +
+  geom_point(data=guns[arrest=="true" & year %in% c(2001,2015)], aes(x=longitude, y=latitude), col="black", fill=NA, alpha=.3, size=.5) +
+  geom_map(data=wardData2, map=wardData2, aes(x=long, y=lat, map_id=id), fill=NA, col="black", size=.3) +
   scale_y_continuous(limits=c(41.6, 42.05), expand=c(0,0)) + scale_x_continuous(limits=c(-88,-87.5)) +
   ggtitle("Weapons related arrests, 2001 & 2015") + xlab("") + ylab("") +
   facet_wrap(~year) + theme_map() + theme(panel.margin.x=unit(15, "pt"))
