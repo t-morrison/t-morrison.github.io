@@ -1,0 +1,48 @@
+---
+title: "Untitled"
+author: "T Morrison"
+date: "September 8, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev='CairoPNG')
+```
+
+```{r}
+library(data.table)
+library(ggplot2)
+library(maptools)
+library(geojsonio)
+```
+
+
+
+
+```{r}
+dc1 <- geojson_read("C:/Users/tmo/Downloads/Neighborhood_Clusters.geojson", what="sp")
+dc_map1 <- fortify(dc1)
+dc_map1 <- merge(dc_map1, dc1, by.x="id", by.y="row.names")
+
+download.file("http://opendata.dc.gov/datasets/c4b0cd43d50949e98e57de9f22b455fc_35.geojson", tf <- tempfile(fileext=".geojson"))
+
+map_nb <- geojson_read(tf, what="sp")
+map_nb <- fortify(geojson_read(tf, what="sp"))
+```
+
+```{r}
+
+ggplot() +
+  geom_polygon(data=dc_map1, aes(x=long, y=lat, group=id), fill="white", col="black")
+```
+
+
+
+
+
+
+
+
+
+
+
