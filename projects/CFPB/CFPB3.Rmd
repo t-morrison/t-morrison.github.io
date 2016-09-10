@@ -128,21 +128,20 @@ ggplot(banks2, aes(x=issue, y=value, fill=L1)) +
 
 So Wells Fargo did not have a disproportionate percentage of complaints about accounted-related issues compared to its competitors. Of course, this does not fully account for each banks wide range of services, but it is definitely an interesting look. Wells Fargo and BoA have way more "Loan modification, collection, foreclosure".
 
+There are no sub-issues in the complaint dataset for Wells Fargo account-related complaints.
+
+```{r}
+unique(cfpb[company=="Wells Fargo & Company" & issue=="Account opening, closing, or management"]$sub_issue)
+```
+
+What products are they connected to?
+
+```{r}
+unique(cfpb[company=="Wells Fargo & Company" & issue=="Account opening, closing, or management"]$product)
+```
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+OK, so all are linked to a bank account or service. That's a pretty broad term. Another interesting variable is `complaint_what_happened` which includes a description of the situation by the person filing the complaint. Unfortunately, there are only 334 observations that have any data in this column; the rest are NA. I will try some text analysis on this at some point.
 
 
 

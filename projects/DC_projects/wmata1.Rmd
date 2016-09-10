@@ -1,0 +1,74 @@
+---
+title: "WMATA Disruptions"
+author: "T Morrison"
+date: "September 10, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev='CairoPNG')
+#rmarkdown::render("C:/Users/tmo/Documents/GitHub/moman822.github.io/projects/DC_projects/wmata1.rmd")
+```
+
+Data from http://opendatadc.org/dataset/wmata-disruption-reports/resource/2fa53a5a-2382-49a7-b8cc-15fc72f98e08
+
+```{r}
+library(data.table)
+library(ggplot2)
+library(lubridate)
+```
+
+```{r, eval=F}
+url <- "https://docs.google.com/spreadsheet/ccc?key=0ApyDIPnioxR3dEswVzIxb2NCdnZTLUZDZE9pTnhMcGc&usp=sharing&output=csv"
+download.file(url, tf <- tempfile(fileext=".csv"))
+wmata <- read.csv(tf, stringsAsFactors = F)
+setDT(wmata)
+
+wmata$Date <- as.Date(wmata$Date, format="%m/%d/%Y")
+wmata$Time <- gsub("a.m.", "AM", wmata$Time)
+wmata$Time <- gsub("p.m.", "PM", wmata$Time)
+wmata$datetime <- as.POSIXct(paste(wmata$Date, wmata$Time), format="%Y-%m-%d %I:%M %p")
+
+```
+
+```{r}
+ggplot(wmata, aes(hour(datetime))) +
+  geom_bar()
+```
+
+
+
+```{r}
+ggplot(wmata, aes(x=Line)) +
+  geom_bar()
+```
+
+```{r}
+ggplot(wmata, aes(x=Delay)) +
+  geom_bar() +
+  scale_x_discrete(breaks=c(0,1,2,4,7,10,20,40))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
