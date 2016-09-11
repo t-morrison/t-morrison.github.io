@@ -16,6 +16,7 @@ Data from http://opendatadc.org/dataset/wmata-disruption-reports/resource/2fa53a
 library(data.table)
 library(ggplot2)
 library(lubridate)
+library(caret)
 ```
 
 ```{r, eval=F}
@@ -28,8 +29,19 @@ wmata$Date <- as.Date(wmata$Date, format="%m/%d/%Y")
 wmata$Time <- gsub("a.m.", "AM", wmata$Time)
 wmata$Time <- gsub("p.m.", "PM", wmata$Time)
 wmata$datetime <- as.POSIXct(paste(wmata$Date, wmata$Time), format="%Y-%m-%d %I:%M %p")
-
+wmata$hour <- hour(wmata$datetime)
+wmata$day <- day(wmata$datetime)
 ```
+
+Make a test data.table
+```{r}
+
+test <- wmata[]
+```
+
+
+
+
 
 ```{r}
 ggplot(wmata, aes(hour(datetime))) +
