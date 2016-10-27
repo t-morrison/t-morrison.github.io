@@ -1,0 +1,125 @@
+---
+title: "First Twitter Analysis"
+author: "T Morrison"
+date: "September 11, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(data.table)
+library(twitteR)
+library(rtweet)
+library(tm)
+library(wordcloud)
+library(SnowballC)
+```
+
+```{r}
+if (packageVersion("devtools") < 1.6) {
+  install.packages("devtools")
+}
+devtools::install_github("mkearney/rtweet")
+
+library(rtweet)
+```
+
+
+```{r}
+consumer_key <- "TYwEaVuJVRerOE2Aj88254gv5"
+consumer_secret <- "YAeVNJhUleHmeq47I381xCjyjIJWXhwEpgKFWcsWoNWpEXVl1q"
+access_token <- "497402507-tBnVBNLKNOGQn7weiN2Cc8aju1U8buMLUkCaqkPR"
+access_secret <- "yiefTAk2AULC8qdzflvZze28KDR88DnX9Ruft58vsihgX"
+```
+
+twitteR
+```{r}
+oauth <- setup_twitter_oauth(consumer_key, consumer_secret)
+```
+
+rtweet
+```{r}
+token <- create_token(app="trm_first_app", consumer_key=consumer_key, consumer_secret=consumer_secret)
+```
+
+
+1. Get tweets with twitteR `searchTwitter()` or rtweet `stream_tweets()` & save to 'tweets'
+2. `stream_tweets()` gives tweets$user_id, save to vector 'users'
+3. Find followers with rtweet `get_friends('users')` and save to vector (or list?) 'followers'
+4. Use 'followers' with twitteR `getUser()`
+
+Get the tweets
+```{r}
+tweets <- search_tweets("oil", n=2000)
+
+```
+
+```{r}
+corpus1 <- VCorpus(VectorSource(tweets$text))
+
+dtm <- DocumentTermMatrix(corpus1)
+inspect(dtm)
+findFreqTerms(dtm, 10)
+findAssocs(dtm, "obama", .5)
+
+dtm2 <- removeSparseTerms(dtm, .9)
+findFreqTerms(dtm2, 20)
+
+dtm2 <- DocumentTermMatrix(corpus1, list(dictionary=c("obama","election")))
+inspect(dtm2)
+```
+
+Get the tweets
+```{r}
+tweets <- search_tweets("oil", n=2000)
+
+```
+
+Clean it up
+```{r}
+tweetCorpus <- VCorpus(VectorSource(tweets$text))
+
+plainCorpus <- tm_map(tweetCorpus, PlainTextDocument)
+
+plainCorpus <- tm_map(plainCorpus, removePunctuation)
+plainCorpus <- tm_map(plainCorpus, stripWhitespace)
+plainCorpus <- tm_map(plainCorpus, content_transformer(tolower))
+plainCorpus <- tm_map(plainCorpus, removeWords, stopwords())
+plainCorpus <- tm_map(plainCorpus, stemDocument)
+
+```
+
+Make document-term matrix
+```{r}
+dtm <- DocumentTermMatrix(plainCorpus)
+findFreqTerms(dtm, 100)
+
+```
+
+Make the word cloud
+```{r}
+wordcloud(plainCorpus, scale=c(10,.5), max.words=100, colors=brewer.pal(8, "Dark2"), random.order=F)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
