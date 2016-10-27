@@ -42,3 +42,11 @@ ul.posts {
 ul.posts li {
     list-style: none;
 }
+
+iframe {
+    height: 500px; /* new height (400 * (1/0.8) ) */
+    width: 125%; /* new width (100 * (1/0.8) )*/
+
+    transform: scale(0.8); 
+    transform-origin: 0 0;
+}
