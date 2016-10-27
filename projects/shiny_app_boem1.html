@@ -2,10 +2,11 @@
 <html>
 	<head>
 	<style>
-#wrap { width: 600px; height: 390px; padding: 0; overflow: hidden; }
-#frame { width: 800px; height: 520px; border: 1px solid black; }
-#frame { zoom: 0.75; -moz-transform: scale(0.75); -moz-transform-origin: 0 0; }
-	</style>
+  #IDNAME {
+    -moz-transform: scale(0.25, 0.25); 
+    -moz-transform-origin: top left;
+  }
+</style>
 		<title>T. Morrison</title>
 		<link rel="stylesheet" type="text/css" href="/css/main.css">
 	</head>
@@ -19,7 +20,7 @@
 		</nav>
 		<div class="container">
 			<p>Built with data from the <a href="https://www.data.boem.gov/homepg/data_center/index.asp">Bureau of Ocean Energy Management</a>, using Shiny in R</p>
-			<iframe src="https://tmorrison.shinyapps.io/boemDataExplorer/" style="border:none;" height="800" width="1400" aign="left"></iframe>
+			<iframe id="IDNAME" src="https://tmorrison.shinyapps.io/boemDataExplorer/" style="border:none;" height="800" width="1400" aign="left"></iframe>
     		<div class="blurb">
     		</div><!-- /.blurb -->
 		</div><!-- /.container -->
