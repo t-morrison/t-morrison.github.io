@@ -2,9 +2,22 @@
 <html>
 	<head>
 		<title>T. Morrison</title>
+		<meta charset="utf-8">
+		
+		<script src="https://d3js.org/d3.v4.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="/css/main.css">
+		<style>
+			#sidebar {
+				position: absolute;
+				right: 0;
+				width: 30%;
+				height: 100%;
+				z-index: 100;
+			}
+		</style>
 	</head>
 	<body>
+		<div id="sidebar"></div>
 		<nav>
     		<ul>
         		<li><a href="/">Home</a></li>
@@ -13,6 +26,7 @@
         		
     		</ul>
 		</nav>
+		
 		<div class="container">
     		<div class="blurb">
         		<h2>A website to host data projects as I explore R and other data analyis/viz tools</h2>
@@ -42,5 +56,29 @@
         		<li><a href="https://github.com/moman822">github.com/moman822</a></li>
 			</ul>
 		</footer>
+		<script>
+			d3.select('#sidebar')
+				.append('svg')
+				.attr('height','100%')
+				.attr('width','100%')
+			d3.select('svg')
+				.append('circle')
+				.attr('cx', '50%').attr('cy','50%').attr('r','5%').attr('fill','black')
+			var bounce = function () {d3.select('circle')
+										.transition()
+										.duration(5000)
+										.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
+										.attr('cy','0%')
+										.on('end', function() {
+											d3.select(this)
+												.transition()
+												.duration(5000)
+												.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
+												.attr('cy','100%')
+												.on('end', bounce);
+												})
+											}
+			bounce()
+		</script>
 	</body>
 </html>
