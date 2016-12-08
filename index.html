@@ -73,14 +73,14 @@
 										.duration(5000)
 										.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
 										.attr('cy','5%')
-										.attr('r', Math.random() * 20 + '%')
+										.attr('r', Math.random() * 10 + '%')
 										.on('end', function() {
 											d3.select(this)
 												.transition()
 												.duration(5000)
 												.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
 												.attr('cy','93%')
-												.attr('r', Math.random() * 20 + '%')
+												.attr('r', Math.random() * 10 + '%')
 												.on('end', bounce);
 												})
 											}
