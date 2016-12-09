@@ -63,10 +63,13 @@
 		<script>
 			var bulletPointColor = function() {d3.selectAll('li')
 									.style('color','white')
+									.style('opacity','0')
 									.transition()
-									.delay(function(d,i){return i * 100})
+									//.delay(5000)
+									.delay(function(d,i){return 1500+(i * 100)})
 									.duration(2000)
 									.style('color','black')
+									.style('opacity','1')
 										//.on('end', function() {
 										//	d3.selectAll('li')
 										//		.transition()
@@ -84,20 +87,21 @@
 				.attr('width','100%')
 			d3.select('svg')
 				.append('circle')
-				.attr('cx', '50%').attr('cy','50%').attr('r','5%').attr('fill','black')
+				.attr('cx', '50%').attr('cy','5%').attr('r','5%').attr('fill','black')
 			var bounce = function () {d3.select('circle')
 										.transition()
+										
 										.duration(5000)
 										.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
-										.attr('cy','5%')
-										.attr('r', Math.random() * 10 + '%')
+										.attr('cy','93%')
+										.attr('r', Math.random() * 6 + '%')
 										.on('end', function() {
 											d3.select(this)
 												.transition()
 												.duration(5000)
 												.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
-												.attr('cy','93%')
-												.attr('r', Math.random() * 10 + '%')
+												.attr('cy','5%')
+												.attr('r', Math.random() * 6 + '%')
 												.on('end', bounce);
 												})
 											}
