@@ -62,19 +62,19 @@
 		</footer>
 		<script>
 			var bulletPointColor = function() {d3.selectAll('li')
-									.style('color','black')
+									.style('color','white')
 									.transition()
 									.delay(function(d,i){return i * 100})
 									.duration(2000)
-									.style('color','white')
-										.on('end', function() {
-											d3.selectAll('li')
-												.transition()
-												.delay(function(d,i){return i * 100})
-												.duration(2000)
-												.style('color','black')
+									.style('color','black')
+										//.on('end', function() {
+										//	d3.selectAll('li')
+										//		.transition()
+										//		.delay(function(d,i){return i * 100})
+										//		.duration(2000)
+										//		.style('color','black')
 													//.on('end', bulletPointColor)
-											});
+										//	});
 									}
 			bulletPointColor()
 			
