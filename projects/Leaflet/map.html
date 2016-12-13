@@ -44,11 +44,17 @@
 	</head>
 
 	<body>
-	
+		
 		<div id="mapid"></div>
 		
 		<div id="plot1"></div>
-		<div id="text">Fuel distillate data from EIA: http://www.eia.gov/dnav/pet/pet_cons_821dst_a_EPD0_VTE_Mgal_a.htm </div>
+		<div id="text"> This tool uses Leaflet.js and D3.js to create an interactive map of the US states and a chart that updates <br>
+						with relevant data when a state is clicked on. The chart data is historical fuel distillate (diesel and other <br>
+						types of refined fuel excluding gasoline) sales volume from 1984 to 2015. The data comes from the EIA <br>
+						and was cleaned for use with R. The y-axis changes according o the range of data for the current state.
+						<br>
+						<br>
+						Fuel distillate data from EIA: <a href="http://www.eia.gov/dnav/pet/pet_cons_821dst_a_EPD0_VTE_Mgal_a.htm" target="_blank">link</a> </div>
 		
 		<script src="us_state2.js" type="text/javascript"></script>
 		<script>
@@ -127,7 +133,7 @@
 			
 		///////////////////
 		//Start leaflet
-			var mymap = L.map('mapid').setView([37.8, -96], 4);
+			var mymap = L.map('mapid').setView([37.8, -96], 3);
 			
 			L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				maxZoom: 19,
