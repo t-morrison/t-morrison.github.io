@@ -80,14 +80,14 @@
 					
 					xScale = d3.scaleLinear()
 								.domain([0, sales.length])
-								.range([sidePadding, svgClientSize.width-sidePadding])
+								.range([sidePadding, svgClientSize.width-(sidePadding/2)])
 					yScale = d3.scaleLinear()
 								.domain([0, d3.max(sales, function(d) { return Number(eval("d." + stateName)) })]) //overall max: 7837118
 								.range([svgClientSize.height-topPadding,topPadding])
 					
 					timeScale = d3.scaleTime()
 									.domain([ new Date(d3.min(sales, function(d) {return d.Date})), new Date(d3.max(sales, function(d) {return d.Date})) ])
-									.range([sidePadding, svgClientSize.width-sidePadding])
+									.range([sidePadding, svgClientSize.width-(sidePadding/2)])
 					
 					var timeAxis = d3.axisBottom(timeScale)
 					
@@ -130,7 +130,7 @@
 											.style('visibility','visible')
 											.style('opacity',1)
 										tooltip.html('<b>'+ d.Date + '<br>' + Number(eval("d." + stateName)).toLocaleString()+' thousand gallons </b>')
-											.style('font-size','16px')
+											.style('font-size','14px')
 											.style('font-family','sans-serif')
 											.style("left", (d3.event.pageX + 8) + "px")
 											.style("top", (d3.event.pageY - 35) + "px");
