@@ -58,7 +58,7 @@
 						Fuel distillate data from EIA: <a href="http://www.eia.gov/dnav/pet/pet_cons_821dst_a_EPD0_VTE_Mgal_a.htm" target="_blank">link</a> </div>
 		
 		<script src="us_state2.js" type="text/javascript"></script>
-		<script>
+		<script type="text/javascript">
 			//Make a nice choropleth of the US states with some intersting info
 		
 		///////////////////
@@ -72,6 +72,7 @@
 			var xScale
 			var svgClientSize = d3.select('#plot1').append('svg').attr('id','graph').attr('width', w).attr('height', h).node().getBoundingClientRect();
 			var timeScale
+			var line
 			
 			function loadD3(stateName) {
 				d3.csv("sales_wide.tsv", function(data){
@@ -105,17 +106,29 @@
 					
 					//d3.select('#plot1').append('svg').attr('id','graph').attr('width', w).attr('height', h)
 					
+					line = d3.line()
+							.x(function(d,i) {return timeScale(new Date(d.Date))} )
+							.y(function(d) {return yScale(Number(eval("d." + stateName)))})
+					
 					if (!!document.getElementById("graph")) {
 						d3.selectAll('#graph').remove()
 						} 
 					
 					d3.select('#plot1').append('svg').attr('id','graph').attr('width', w).attr('height', h)				
+							.append('path')
+								.attr('d', line(sales))
+								.attr('stroke','black')
+								.attr('stroke-width',1)
+								.attr('fill','none')
+					
+					//d3.select('#plot1').append('svg').attr('id','graph').attr('width', w).attr('height', h)
+					d3.select('#graph')
 							.selectAll('circle')
 							.data(sales)
 							.enter()
 							.append('circle')
 								.attr('cy', function(d){ return  yScale(Number(eval("d." + stateName))) })
-								.attr('cx', function(d,i){ return xScale(i)})
+								.attr('cx', function(d,i){ return timeScale(new Date(d.Date))})
 								.attr('r','.5%')
 								//transition
 								.on("mouseover", function(d,i){
