@@ -144,7 +144,7 @@
 											.duration(200)
 											.style('visibility','visible')
 											.style('opacity',1)
-										tooltip.html('<b>'+ formatYear(new Date(d.Date)) + '<br>' + Number(eval("d." + stateName)).toLocaleString()+' thousand gallons </b>')
+										tooltip.html('<b>'+ formatYear(new Date(d.Date)) + '<br>' + Math.round(Number(eval("d." + stateName))).toLocaleString()+' million gallons </b>')
 											.style('font-size','14px')
 											.style('font-family','sans-serif')
 											.style("left", (d3.event.pageX + 8) + "px")
@@ -180,12 +180,12 @@
 						.attr('y', topPadding/2)
 						.attr('text-anchor', 'middle')
 						.style('font-size','16px').style('font-family','sans-serif')						
-						.text("Sales of Distillate Fuel Oil in " + fullState)
+						.text("Annual Sales of Distillate Fuel Oil in " + fullState)
 					d3.select('#graph').append('text')
 						.attr('text-anchor', 'middle')
 						.attr('transform','translate('+(sidePadding/4)+','+(svgClientSize.height/2)+')'+'rotate(-90)')
 						.style('font-size','16px').style('font-family','sans-serif')						
-						.text("Thousands of Gallons")
+						.text("Million Gallons")
 				});
 			};
 			
