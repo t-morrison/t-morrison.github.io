@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+	<title>Path 1: Country click</title>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+			
+		<style>
+			#plot {
+				position: fixed;
+				height: 50%;
+				width: 80%;
+				background-color: aqua;
+			}
+			#buttonsDiv {
+				position: fixed;
+				top: 0;
+				right: 10%;
+			}
+		</style>
+			
+	</head>
+
+	<body>
+	
+		<div id='plot'></div>
+		
+		<div id='buttonsDiv'>
+			<ul id='buttons'>
+				<!--
+				<li><button onClick="companyButtonFunction('BP')">BP</button></li>
+				<li><button onClick="companyButtonFunction('Shell')">Shell</button></li>
+				-->
+			</ul>
+		</div>
+		
+		<script type="text/javascript">
+	//Setup//		
+			var margin = {top: 60, bottom: 40, left: 100, right: 100}
+			
+			var svgClientSize = d3.select('#plot').node().getBoundingClientRect();
+			
+			var width = svgClientSize.width - margin.left - margin.right
+			var height = svgClientSize.height - margin.top - margin.bottom
+			
+			var svg = d3.select('#plot').append('svg')
+							.attr('id', 'mainPlot')
+							.attr('width', width + margin.left + margin.right)
+							.attr('height', height + margin.top + margin.bottom)
+						.append('g')
+							.attr('transform', 'translate('+ margin.left +','+ margin.top +')')
+						
+			var xScale //= d3.scaleLinear()
+				  //		.domain([0,200])		//needs new inputs
+				  //		.range([0, width]);
+
+			var yScale //= d3.scaleLinear()
+				  //		.domain([0,200])		//needs new inputs
+				  //		.range([height, 0]);
+			var yHeight
+			var BP
+			var Shell
+			var mydata
+			var subset
+			var companyButtonFunction
+			var byCompanyCountry
+			var names
+			var selectID
+			var byCompanyCountryGovt
+	//End setup//
+	
+	//Make buttons dynamically
+			d3.csv('https://docs.google.com/spreadsheets/d/1H13ML4M2KrHmYeUpm0W_reHnhtwyMbsxsQDkW39drTU/pub?gid=353610037&single=true&output=csv', function(data){
+				names = data
+								
+				for(i=0; i < names.length; i++) {
+					d3.select('#buttons').append('li').append('button').text(names[i].Company).attr('onClick','companyButtonFunction("'+names[i].Company+'")')
+				}
+				
+			});
+		
+
+	//Get data
+			d3.csv('https://docs.google.com/spreadsheets/d/1H13ML4M2KrHmYeUpm0W_reHnhtwyMbsxsQDkW39drTU/pub?gid=0&single=true&output=csv', function(data) {
+				mydata = data
+											 
+		//set up scales				
+			
+			
+		//sort data			
+			//BP = mydata.filter(function(entry) { return entry.Company === 'BP' })
+			//Shell = mydata.filter(function(entry) { return entry.Company === 'Shell' })
+				
+				byCompanyCountry = d3.nest()
+								.key(function(d){return d.Company})
+								.key(function(d){return d.Country})
+								.rollup(function(v){return d3.sum(v, function(d){return d.Amount})})
+								.entries(mydata)
+				
+				xScale = d3.scaleLinear()
+						.domain([0,byCompanyCountry])
+						.range([0,width])
+				
+				
+				
+		//make the plot
+				companyButtonFunction = function(company) {
+					d3.selectAll('rect').remove()
+					d3.select('#yAxis').remove()
+					d3.selectAll('text').remove()
+							
+					yScale = d3.scaleLinear()
+							.domain([0,
+									d3.max(byCompanyCountry.filter(function(entry){return entry.key===company})[0].values, /// input here
+											  function(d) {return Number(d.value)}) 
+									])
+							.range([height, 0]);
+					yHeight = d3.scaleLinear()
+							.domain([0,
+									d3.max(byCompanyCountry.filter(function(entry){return entry.key===company})[0].values, /// input here
+											  function(d) {return Number(d.value)}) 
+									])
+							.range([0, height]);
+					yAxis = d3.axisLeft(yScale)
+				
+					
+					svg.selectAll('rect')
+						.data(byCompanyCountry.filter(function(entry){return entry.key===company})[0].values)				/// input here
+						.enter()
+						.append('rect')
+							.attr('x', function(d,i){return (i * 100)+20})//d.values.length)
+							.attr('y', function(d){return yScale(d.value)})
+							.attr('height', (function(d){return yHeight(d.value)}))
+							.attr('width',50)
+							.attr('id', function(d){return d.key})
+					svg.selectAll('text')
+						.data(byCompanyCountry.filter(function(entry){return entry.key===company})[0].values)				/// input here
+						.enter()
+						.append('text')
+							.text(function(d){return d.key})
+							.attr('x', function(d,i){return (i * 100)+45})
+							.attr('y', 0)
+							.attr('text-anchor', 'middle')
+					svg.append('g')
+						.attr('id','yAxis')
+						.call(yAxis)
+						
+					d3.selectAll('rect')
+						.on('click', function() {
+										selectID = $(this).attr('id')
+										d3.selectAll('rect').remove()
+										d3.select('#yAxis').remove()
+										d3.selectAll('text').remove()
+										console.log(company)
+										
+										byCompanyCountryGovt = d3.nest()							//Available variables: company, selectID (clicked country)
+															 .key(function(d){return d.Company})
+															 //.key(function(d){return d.Country})
+															 //.rollup(function(v){return d3.sum(v, function(d){return d.Amount})})
+															 .entries(mydata.filter(function(entry){return entry.Company===company && entry.Country===selectID}))
+									})
+				};
+					
+			});
+			
+			
+
+			
+			
+			
+		</script>
+	</body>
+
+
+</html>
