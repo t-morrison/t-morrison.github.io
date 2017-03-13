@@ -24,7 +24,7 @@
 		
 		
 		<script>
-			var margin = {top:40, bottom:40, left:40, right:40}
+			var margin = {top:40, bottom:40, left:100, right:40}
 			var width = 1000 - margin.left - margin.right
 			var height = 600 - margin.top - margin.bottom
 			
@@ -89,20 +89,24 @@
 				lineScaleRaw = d3.line()
 								//.curve(d3.curveCardinal())
 								.x(function(d){return xScaleRaw(d.raw_place)})
-								.y(function(d){return yScaleGDP(d.ratio_pay)})
-								
+								.y(function(d){return yScaleRaw(d.raw_pay)})								
 				lineScaleNormal = d3.line()
 								//.curve(d3.curveCardinal())
 								.x(function(d){return xScaleNorm(d.norm_place)})
-								.y(function(d){return yScaleNorm(d.norm_pay)})
-				
+								.y(function(d){return yScaleNorm(d.norm_pay)})				
 				lineScaleRatio = d3.line()
 								//.curve(d3.curveCardinal())
 								.x(function(d){return xScaleRaw(d.raw_place)})
-								.y(function(d){return yScaleNorm(d.ratio_pay)})
+								.y(function(d){return yScaleGDP(d.ratio_pay)})				
 				
-				lineScaleXRaw = d3.line()
-								.x(function(d){return xScaleRaw(d.raw_place)})
+					
+				
+				xAxisRaw = d3.axisBottom(xScaleRaw)
+				xAxisNormal = d3.axisBottom(xScaleNorm)
+				
+				yAxisRaw = d3.axisLeft(yScaleRaw)
+				yAxisRatio = d3.axisLeft(yScaleGDP)
+				yAxisNormal = d3.axisLeft(yScaleNorm)
 				
 				svg.selectAll('path')
 					.data(datNest, function(d) {return d})
@@ -138,50 +142,80 @@
 								.attr('stroke', function(d){return fillScale(d.key)})
 							d3.select('.tooltip')
 								tooltip.transition()
-									.duration(1500)
 									.style('visibility','hidden')
 						})
-						
+				
+				d3.select('svg').append('g')
+					.attr('class', 'xaxis')
+					.attr('transform', 'translate('+ margin.left +','+ (height+margin.bottom) +')')
+					.call(xAxisRaw)
+				d3.select('svg').append('g')
+					.attr('class', 'yaxis')
+					.attr('transform', 'translate('+ margin.left +','+ margin.top +')')
+					.call(yAxisRaw)
+				
 				
 			});
 			
-			toNormal = function() {
+			xAxisToNormal = function() {
+				d3.select('.axis')
+					.transition()
+					.duration(3000)
+					.call(xAxisNormal)
 				
-				d3.selectAll('path')
+			}
+			
+			toNormal = function() {				
+				//d3.selectAll('path')
+				svg.selectAll('path')
 					.transition()
 					.duration(3000)
 						//.attr('stroke-width', 5)
 						.attr('d', function(d) {return lineScaleNormal(d.values)})
+				d3.select('.xaxis')
+					.transition()
+					.duration(3000)
+					.call(xAxisNormal)
+				d3.select('.yaxis')
+					.transition()
+					.duration(3000)
+					.call(yAxisNormal)
 						
 			}
 			
-			toRaw = function() {
-				
-				d3.selectAll('path')
+			toRaw = function() {				
+				//d3.selectAll('path')
+				svg.selectAll('path')
 					.transition()
 					.duration(3000)
 						//.attr('stroke-width', 5)
 						.attr('d', function(d) {return lineScaleRaw(d.values)})
+				d3.select('.xaxis')
+					.transition()
+					.duration(3000)
+					.call(xAxisRaw)
+				d3.select('.yaxis')
+					.transition()
+					.duration(3000)
+					.call(yAxisRaw)
 						
 			}
 			
-			toRawX = function() {
-				
-				d3.selectAll('path')
+			toRatio = function() {				
+				//d3.selectAll('path')
+				svg.selectAll('path')
 					.transition()
 					.duration(3000)
 						//.attr('stroke-width', 5)
-						.attr('d', function(d) {return lineScaleXRaw(d.values)})
-						
-			}
-			
-			toRatio = function() {
-				
-				d3.selectAll('path')
-					.transition()
-					.duration(2000)
-						//.attr('stroke-width', 5)
 						.attr('d', function(d) {return lineScaleRatio(d.values)})
+				d3.select('.xaxis')
+					.transition()
+					.duration(3000)
+					.call(xAxisRaw)
+				d3.select('.yaxis')
+					.transition()
+					.duration(3000)
+					.call(yAxisRatio)
 						
 			}
 		
