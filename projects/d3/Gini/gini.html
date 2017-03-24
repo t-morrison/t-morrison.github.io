@@ -11,20 +11,20 @@
 			#plot {
 				height: 600px;
 				width: 1000px;
-				background-color: aqua
+				background-color: white
 			}
 		</style>
 	</head>
 
 	<body>
+		
+		<div id='plot'></div>
 		<button id='button' onclick="toRaw()">Raw axes</button>
 		<button id='button' onclick="toNormal()">Normalilzed axes</button>		
 		<button id='button' onclick="toRatio()">Raw axes (payments to GDP ratio)</button>
-		<div id='plot'></div>
-		
 		
 		<script>
-			var margin = {top:40, bottom:40, left:100, right:40}
+			var margin = {top:40, bottom:40, left:150, right:40}
 			var width = 1000 - margin.left - margin.right
 			var height = 600 - margin.top - margin.bottom
 			
@@ -144,7 +144,24 @@
 								tooltip.transition()
 									.style('visibility','hidden')
 						})
-				
+				svg.append('text')
+					.attr('class', 'xlab')
+					.attr('x', width/2)
+					.attr('y', height+margin.bottom-7)
+					.attr('opacity', 1)
+					.attr('text-anchor', 'middle')
+					.style('font-size','16px').style('font-family','sans-serif')						
+					.text("Number of companies")
+				svg.append('text')
+					.attr('class', 'ylab')
+					.attr('text-anchor', 'middle')
+					.attr('opacity', 1)
+					//.attr('x', '50%')
+					//.attr('y', height/2)
+					.attr('transform','translate('+(-margin.left/1.5)+','+(height/2)+')'+'rotate(-90)')
+					.style('font-size','16px').style('font-family','sans-serif')						
+					.text("Cumulative Payments (USD)")
+						
 				d3.select('svg').append('g')
 					.attr('class', 'xaxis')
 					.attr('transform', 'translate('+ margin.left +','+ (height+margin.bottom) +')')
@@ -180,6 +197,22 @@
 					.transition()
 					.duration(3000)
 					.call(yAxisNormal)
+				d3.select('.ylab')
+					.transition()
+						.duration(1500)
+						.attr('opacity', 0)
+					.transition()
+						.duration(1500)
+						.text('Cumulative share of payments')
+						.attr('opacity', 1)
+				d3.select('.xlab')
+					.transition()
+						.duration(1500)
+						.attr('opacity', 0)
+					.transition()
+						.duration(1500)
+						.text('Cumulative share of companies')
+						.attr('opacity', 1)
 						
 			}
 			
@@ -198,7 +231,23 @@
 					.transition()
 					.duration(3000)
 					.call(yAxisRaw)
-						
+				d3.select('.ylab')
+					.transition()
+						.duration(1500)
+						.attr('opacity', 0)
+					.transition()
+						.duration(1500)
+						.text('Cumulative payments (USD)')
+						.attr('opacity', 1)
+				d3.select('.xlab')
+					.transition()
+						.duration(1500)
+						.attr('opacity', 0)
+					.transition()
+						.duration(1500)
+						.text('Cumulative number of companies')
+						.attr('opacity', 1)
+				
 			}
 			
 			toRatio = function() {				
@@ -216,6 +265,22 @@
 					.transition()
 					.duration(3000)
 					.call(yAxisRatio)
+				d3.select('.ylab')
+					.transition()
+						.duration(1500)
+						.attr('opacity', 0)
+					.transition()
+						.duration(1500)
+						.text('Cumulative ratio of payments to GDP')
+						.attr('opacity', 1)
+				d3.select('.xlab')
+					.transition()
+						.duration(1500)
+						.attr('opacity', 0)
+					.transition()
+						.duration(1500)
+						.text('Cumulative number of companies')
+						.attr('opacity', 1)
 						
 			}
 		
