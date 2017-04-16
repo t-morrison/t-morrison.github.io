@@ -54,9 +54,9 @@
 			
 			var map = {type:'FeatureCollection', features: []}
 			
-			d3.csv('https://docs.google.com/spreadsheets/d/1gdOC6_hAsZVeDN_QN2_702Np32TXXSA5l3Udyhl432w/pub?output=csv', function(data){
-				dat = data
-				years = d3.nest().key(function(d){return d.Year}).entries(dat)
+			//d3.csv('https://docs.google.com/spreadsheets/d/1gdOC6_hAsZVeDN_QN2_702Np32TXXSA5l3Udyhl432w/pub?output=csv', function(data){
+				//dat = data
+				//years = d3.nest().key(function(d){return d.Year}).entries(dat)
 			
 				d3.json("map.geo.json", function(d) {
 					map = d
@@ -115,7 +115,7 @@
 						})
 					
 				});
-			})
+			//})
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
