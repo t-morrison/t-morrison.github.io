@@ -21,11 +21,12 @@
 		
 		<div id='plot'></div>
 		<button id='button' onClick='playGame()'>Begin round</button>
+		<h3 id='missiles'>Warheads remaining: </h3>
 		<h3 id='score'>Score: </h3>
 		<h3 id='roundCounter'>Rounds: </h3>
 		
 		<script>
-			alert('Welcome to IRON DOME, a geography game created entirely with D3.js by Tommy Morrison.\n\nSITREP: 40 warheads have been stolen by international terrorist-criminal organization ANARCHY99. They have made no demands, and are planning to launch five warheads at five countries every day while their stockpile remains. We have only two lines of defense against this. The first is the IRON DOME, an advanced missile defense system that can be implemented on a country-wide scale.\n\nHowever, the IRON DOME can only be activated moments before missile impact due to the intense energy requirements of the system. Luckily, we have an inside operative in ANARCHY99 who will deliver us advanced warnings of the target countries. Use your geographic knowledge to activate the IRON DOME by clicking on the target countries on the map! You have 8 seconds to activate before launch!\n\nOnce the missiles are launched, you can try to use the orbital laser defense system SATDEF-12 to vaporize the missiles from space. Use your mouse to click on the missile path to destroy it after launch! The launch site could be anywhere on the globe, so keep your eyes open!\n\nWe cannot afford to lose more than twenty countries, so be prepared. We are counting on you!\n\nClick “Begin round” to start the game and move between rounds. Refresh the browser to replay.')
+			alert('Welcome to IRON DOME, a geography game created entirely with D3.js by Tommy Morrison.\n\nSITREP: 50 warheads have been stolen by international terrorist-criminal organization ANARCHY99. They have made no demands, and are planning to launch five warheads at five countries every day while their stockpile remains. We have only two lines of defense against this. The first is the IRON DOME, an advanced missile defense system that can be implemented on a country-wide scale.\n\nHowever, the IRON DOME can only be activated moments before missile impact due to the intense energy requirements of the system. Luckily, we have an inside operative in ANARCHY99 who will deliver us advanced warnings of the target countries. Use your geographic knowledge to activate the IRON DOME by clicking on the target countries on the map! You have 8 seconds to activate before launch!\n\nOnce the missiles are launched, you can try to use the orbital laser defense system SATDEF-12 to vaporize the missiles from space. Use your mouse to click on the missile path to destroy it after launch! The launch site could be anywhere on the globe, so keep your eyes open!\n\nWe cannot afford to lose more than twenty countries, so be prepared. We are counting on you!\n\nClick “Begin round” to start the game and move between rounds. Refresh the browser to replay.')
 			
 			
 			var margin = {top:100, bottom:0, left:0, right:0}
@@ -48,6 +49,7 @@
 			var path
 			var samp = [[[2.25929,48.900552],[1.659626,28.033886]],[[2.25929,48.900552],[21.758664,-4.038333]],[[2.25929,48.900552],[-63.588653,-16.290154]],[[2.25929,48.900552],[8.675277,9.081999]],[[2.25929,48.900552],[53.847818,23.424076]],[[2.25929,48.900552],[51.183884,25.354826]],[[2.25929,48.900552],[95.955974,21.916221]],[[2.25929,48.900552],[-3.435973,55.378051]],[[2.25929,48.900552],[100.992541,15.870032]],[[2.25929,48.900552],[11.609444,-0.803689]],[[2.25929,48.900552],[22.937506,-30.559482]],[[2.25929,48.900552],[30.802498,26.820553]],[[2.25929,48.900552],[17.873887,-11.202692]],[[2.25929,48.900552],[2.213749,46.227638]],[[2.25929,48.900552],[8.468946,60.472024]],[[2.25929,48.900552],[43.679291,33.223191]],[[2.25929,48.900552],[-10.940835,21.00789]],[[2.25929,48.900552],[46.869107,-18.766947]],[[2.25929,48.900552],[-95.712891,37.09024]],[[2.25929,48.900552],[-5.54708,7.539989]],[[2.25929,48.900552],[-51.92528,-14.235004]],[[2.25929,48.900552],[66.923684,48.019573]],[[2.25929,48.900552],[114.727669,4.535277]],[[2.25929,48.900552],[25.48583,42.733883]],[[2.25929,48.900552],[-106.346771,56.130366]],[[2.25929,48.900552],[37.906193,-0.023559]],[[2.25929,48.900552],[48.516388,15.552727]],[[2.25929,48.900552],[-0.3098187,53.7538678]],[[2.25929,48.900552],[5.291266,52.132633]],[[2.25929,48.900552],[-55.765835,-32.522779]],[[2.25929,48.900552],[105.318756,61.52401]],[[2.25929,48.900552],[12.56738,41.87194]],[[2.25929,48.900552],[-66.58973,6.42375]],[[2.25929,48.900552],[-63.616672,-38.416097]],[[2.25929,48.900552],[32.290275,1.373333]],[[2.25929,48.900552],[55.975413,21.4735329]],[[2.25929,48.900552],[21.758664,-4.038333]],[[2.25929,48.900552],[17.228331,26.3351]],[[2.25929,48.900552],[47.576927,40.143105]],[[2.25929,48.900552],[-7.09262,31.791702]],[[2.25929,48.900552],[33.429859,35.126413]],[[2.25929,48.900552],[104.195397,35.86166]]]
 			var samp2
+			
 			
 			var addIso = []
 			var addName = []
@@ -133,10 +135,11 @@
 			var fireCountries = []
 			var fireIso = []
 			var classString = []
-			var startDelay = 10000
-			var lineGrow = 7000
+			var startDelay = 8000
+			var lineGrow = 6000
 			var fillFire = 00
 			var delay2 = 1000
+			var warheads = 50
 			
 			
 			var rv = []
@@ -157,41 +160,56 @@
 			
 			
 			function playGame() {
+				warheads = warheads-5
 				lineGrow = lineGrow*.90
 				d3.selectAll('.allRoute').remove()
 			
 				randomStringCoord()
 				dead = dead + d3.selectAll("[fill='rgb(255, 0, 0)']").size()
 				
-				if(dead<startScore){
-					
-					rounds = rounds+1
-					console.log('Dead: '+dead)
-					d3.select('.score').remove()
-					d3.select('#score').append('text').attr('class','score').text(startScore-dead)
-					
-					d3.select('.roundCounter').remove()
-					d3.select('#roundCounter').append('text').attr('class','roundCounter').text(rounds)
-					
-					d3.selectAll('.route').remove();
-					d3.selectAll('.targets').remove();
-					
-					randomCoords(6)
-					targetsText(fireCountries.slice(1))
-					
-					setTimeout(function(){
-						console.log(fireCoords)
-						fire(fireCoords)
-						//targetsText(fireCountries)
-					}, 000)							//time to start after click; starts whole process
-				} if(dead>=startScore) {
-					svg.append('text')
-						.attr('x', (width/2)-490)
-						.attr('y', (height/2)-70)
-						.attr("font-family", "calibri")
-						.attr("font-size", "175px")
-						.text('ANNIHILATED')
+				if(warheads >= 0){
+					if(dead<startScore){
+						
+						rounds = rounds+1
+						console.log('Dead: '+dead)
+						d3.select('.score').remove()
+						d3.select('#score').append('text').attr('class','score').text(startScore-dead)
+						
+						d3.select('.missiles').remove()
+						d3.select('#missiles').append('text').attr('class','missiles').text(warheads)
+						
+						d3.select('.roundCounter').remove()
+						d3.select('#roundCounter').append('text').attr('class','roundCounter').text(rounds)
+						
+						d3.selectAll('.route').remove();
+						d3.selectAll('.targets').remove();
+						
+						randomCoords(6)
+						targetsText(fireCountries.slice(1))
+						
+						setTimeout(function(){
+							console.log(fireCoords)
+							fire(fireCoords)
+							//targetsText(fireCountries)
+						}, 000)							//time to start after click; starts whole process
+					} if(dead>=startScore) {
+						svg.append('text')
+							.attr('x', (width/2)-490)
+							.attr('y', (height/2)-70)
+							.attr("font-family", "calibri")
+							.attr("font-size", "175px")
+							.text('ANNIHILATED')
+					}
 				}
+					else {
+						svg.append('text')
+							.attr('x', (width/2)-350)
+							.attr('y', (height/2)-70)
+							.attr("font-family", "calibri")
+							.attr("font-size", "175px")
+							.text('VICTORY!')
+					}
+				
 			}
 						
 			function targetsText(dataText) {
