@@ -142,9 +142,11 @@
 			var rv = []
 			
 			function randomStringCoord() {
-				randLat = (Math.random()*120)-60
-				randLon = (Math.random()*360)-180
+				//randLat = (Math.random()*120)-60
+				//randLon = (Math.random()*360)-180
 				for (var i = 0; i < coords2.length; ++i) {
+					randLat = (Math.random()*120)-60
+					randLon = (Math.random()*360)-180
 					rv[i] = {'type':'LineString', 'coordinates':[[randLon,randLat],coords2[i]], 'dest':addIso[i]}
 					//rv;
 				}
@@ -155,6 +157,7 @@
 			
 			
 			function playGame() {
+				lineGrow = lineGrow*.90
 				d3.selectAll('.allRoute').remove()
 			
 				randomStringCoord()
