@@ -136,7 +136,7 @@
 			var fireIso = []
 			var classString = []
 			var startDelay = 8000
-			var lineGrow = 6000
+			var lineGrow = 6500
 			var fillFire = 00
 			var delay2 = 1000
 			var warheads = 50
@@ -200,8 +200,14 @@
 							.attr("font-size", "175px")
 							.text('ANNIHILATED')
 					}
-				}
-					else {
+				} else if (warheads<0 & dead>=startScore) {
+					svg.append('text')
+							.attr('x', (width/2)-490)
+							.attr('y', (height/2)-70)
+							.attr("font-family", "calibri")
+							.attr("font-size", "175px")
+							.text('ANNIHILATED')
+				}	else {
 						svg.append('text')
 							.attr('x', (width/2)-350)
 							.attr('y', (height/2)-70)
