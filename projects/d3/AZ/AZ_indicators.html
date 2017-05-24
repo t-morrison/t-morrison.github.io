@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+	
+	<head>
+		<meta charset="utf-8">
+		<title>The AZ Viz</title>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		
+		<style>
+			#plot {
+				height: 600px;
+				width: 1000px;
+				background-color: white
+			}
+		</style>
+	</head>
+
+	<body>
+		
+		<button onClick="movePath2()" type="button">Click for indicators</button>
+		
+		<div id="checks">
+			<label><input type="checkbox" class="box" value="Budget expenses of SOFAZ-total">Budget expenses of SOFAZ-total</label><br>
+			<label><input type="checkbox" class="box" value="Budget expenses total">Budget expenses total</label><br>
+			<label><input type="checkbox" class="box" value="Budget revenues total">Budget revenues total</label><br>
+			<label><input type="checkbox" class="box" value="Education expenses">Education expenses</label><br>
+			<label><input type="checkbox" class="box" value="Health expenses">Health expenses</label><br>
+			<label><input type="checkbox" class="box" value="Infrastructure-industrial">Infrastructure-industrial</label><br>
+			<label><input type="checkbox" class="box" value="Non-oil revenues of state budget">Non-oil revenues of state budget</label><br>
+			<label><input type="checkbox" class="box" value="Oil money in budget">Oil money in budget</label>
+			
+		</div>
+		
+		
+		
+		<div id='plot'></div>
+		
+		
+		<script>
+		
+			$(document).ready(function(){
+				$('input[type=checkbox]').prop("checked", false);
+			});
+			
+			var margin = {top:40, bottom:40, left:80, right:240}
+			var width = 1200 - margin.left - margin.right
+			var height = 600 - margin.top - margin.bottom
+			
+			var svg = d3.select('#plot').append('svg')
+							.attr('width', width + margin.left + margin.right)
+							.attr('height', height + margin.top + margin.bottom)
+						.append('g')
+							.attr('transform','translate('+margin.left+','+margin.top+')')
+			
+			var dat
+			
+			var yScale
+			var xScale
+			var rScale
+			
+			var addCountry
+			var addLine
+			var movePath
+			var linePath
+			
+			var datNest
+			var dat
+			var lineScale
+			var flags = [], uniqueInd = [], l, i;
+			
+			console.log("before load csv")
+			
+			d3.csv('az_long.csv', function(data) {
+				
+				dat=data
+				console.log("in the csv call")
+				//dat=data
+				data.forEach(function(d) {
+					d.Value = +d.Value;
+					d.Year = +d.Year
+				});
+												
+				data = data.filter(function(d){return d.Currency=="mln.$US"})
+				
+				datNest = d3.nest()
+							.key(function(d){return d.Indicators})
+							.sortKeys(d3.ascending)
+							.entries(data)
+				for( i=0; i<datNest.length; i++) {
+					if( flags[datNest[i].key]) continue;
+					flags[datNest[i].key] = true;
+					uniqueInd.push(datNest[i].key);
+				}
+				
+				console.log(datNest)
+				
+				
+				
+				yScale = d3.scaleLinear()
+								.domain([0,d3.max(data, function(d){return +d.Value})])
+								.range([height,0])
+				xScale = d3.scaleLinear()
+								.domain([d3.min(dat, function(d){return +d.Year}), d3.max(dat, function(d){return +d.Year})])
+								.range([0, width])
+								
+				
+				//rScale = d3.scaleLinear()
+				//				.domain([d3.min(data, function(d){return +d.GHG}),d3.max(data, function(d){return +d.GHG})])
+				//				.range([0,50])
+				fillScale = d3.scaleOrdinal()
+								.range(d3.schemeCategory20) //NRGI colors: "#FF6F4C", "#557288", "#53CAEC", "#DD5061", "#ffa893", "#aab9c4", "#5B5D62"
+								.domain([uniqueInd])
+				timeScale = d3.scaleTime()
+								.domain([new Date(d3.min(data, function(d){return (+d.Year) +',0,1'})), new Date(d3.max(data, function(d){return +d.Year+',0,1'}))])
+								.range([0, width])
+				lineScale = d3.line()
+								.curve(d3.curveCardinal())
+								//.x(function(d){return xScale(d.Year)})//timeScale(new Date(d.Year+',1,1'))})
+								//.y(function(d){return yScale(d.yVar)}) //yVar??
+								
+				svg.append('g')
+					.attr('transform','translate(0,'+height+')')
+					.call(d3.axisBottom(timeScale))
+				svg.append('g')
+					//.attr('transform','translate(-25,0)')
+					.call(d3.axisLeft(yScale))
+				
+				console.log("end of csv")
+			
+			})				
+			
+		//FUNCTION set variables in datNest using a function
+		console.log("after d3.csv")
+		var datNestTemp
+			
+		var choices = []	
+			
+		var tooltip = svg
+			.append("text")
+			//.style("position", "absolute")
+			.style("z-index", "10")
+			.style("visibility", "hidden")
+			//.text("a simple tooltip");
+			
+			
+			
+			
+				  
+			  
+			console.log("after update")
+			
+			function update(){
+				choices = []
+				d3.selectAll(".box").each(function(d){
+				  cb = d3.select(this);
+				  if(cb.property("checked")){
+					choices.push(cb.property("value"));
+				  }
+				});
+				
+				if(choices.length > 0){
+				  //datNestTemp = datNest.filter(function(d,i){return d.key.includes(choices)});
+				  
+				  datNestTemp = datNest.filter(function(v) {
+							for (i=0; i<choices.length; i++){ 
+								if (v.key == choices[i]) {
+									return true;
+								}
+								//otherwise the loop continues
+							}
+							//if none of them matched
+							return false;
+								});
+				} else {
+					datNestTemp = "blank"
+				}
+			}
+			
+			d3.selectAll(".box").on("change",update);
+			
+		//FUNCTION movePath2
+			var path
+		
+			movePath2 = function() {
+				
+				console.log("start of movePath2")
+				
+				//console.log(datNest[0].values[0])
+				
+				d3.selectAll('[tag=lines]').remove().selectAll('circle').remove()
+			//Add paths
+				lineScale = d3.line()
+								.curve(d3.curveCatmullRom)
+								.x(function(d){return timeScale(new Date(d.Year+',1,1'))})
+								.y(function(d){return yScale(eval(d.Value))})
+				
+				
+				//console.log(datNestTemp[0].values)
+				
+				svg.selectAll('path')
+								.data(datNestTemp, function(d){console.log(d); return d})
+								.enter()
+								.append('path')
+									.attr('d',function(d){console.log(lineScale(d.values)); return lineScale(d.values)})
+									.attr('class',function(d){return d.key.replace(/ /g,'')})
+									.attr('stroke',function(d){return fillScale(d.key)})
+									.attr('name', function(d){return d.key})
+									//.attr('xmax', d3.max(d, function(d){return d.Year}))
+									.attr('tag', 'lines')
+									.attr('stroke-width',2)
+									.attr('fill','none')
+								.each(function(d,i){
+									var node1 = d3.select(this).node().getTotalLength()
+									d3.select(this)
+										.attr("stroke-dasharray", node1 + " " + node1)
+										.attr("stroke-dashoffset", node1)
+										.transition()
+										.duration(5000)
+											.attr("stroke-dashoffset", 0);
+								})	
+								.on('mouseover', function(d){
+										len = d.values.length - 1
+										
+										d3.select(this)
+											.attr('stroke-width', 5)
+										tooltip.style("visibility", "visible")
+											.text(d.key)
+											.attr('x', xScale(2016)+6)
+											.attr('y', yScale(d.values[len].Value)+3)
+										console.log(d.values)
+									})
+								.on('mouseout', function(d){
+										d3.select(this)
+											.attr('stroke-width', 2)
+										tooltip.style("visibility", "hidden")
+									})
+				
+				
+				
+				
+			
+			//Add & move circles
+				svg.selectAll('circle')
+					.data(datNestTemp)
+					.enter()
+					.append('circle')
+						.attr('cx',0)
+						.attr('cy',0)
+						.attr('class', function(d){return d.key.replace(/ /g,'')})
+						.attr('fill', function(d){return fillScale(d.key)})
+						.attr('r',0)//function(d){return rScale(d.Value)}) //
+					.each(function(d,i){
+						x1 = d3.select(this).attr('class')
+						 path1 = d3.selectAll('path').filter('.'+d3.select(this).attr('class')).node()//.getTotalLength()
+						
+						function translateAlong(path) {
+						  var l = path.getTotalLength();
+						  return function(d, i, a) {
+							return function(t) {
+							  var p = path.getPointAtLength(t * l);
+							  return "translate(" + p.x + "," + p.y + ")";
+							};
+						  };
+						}
+						d3.select(this)
+							.transition()
+							.duration(10000)
+								.attrTween('transform', translateAlong(path1))
+					})
+					
+				//svg.selectAll('circle')
+				//	.data(datNestTemp, function(d,i){return d[i].values})
+				//	.enter()
+				//	.append('circle')
+				//		.attr('cy', function(d) {return yScale(d.Value)})
+				//		.attr('cx', function(d) {return xScale(+d.Year)})
+				//		.attr('r', 5)//function(d) {return rScale(d.GHG)})
+					
+				function translateAlong(path) {
+				  var l = path.getTotalLength();
+				  return function(d, i, a) {
+					return function(t) {
+					  var p = path.getPointAtLength(t * l);
+					  return "translate(" + p.x + "," + p.y + ")";
+					};
+				  };
+				};
+			//	function translateRadius(path) {
+			//	  var l = path.getTotalLength();
+			//	  return function(d, i, a) {
+			//		return function(t) {
+			//		  var p = path.getPointAtLength(t * l);
+			//		  return "translate(" + p.x + "," + p.y + ")";
+			//		};
+			//	  };
+			//	}
+			}
+			
+			var x1
+			var path1
+			
+			
+			
+			
+			//addCountry('Canada',Value,GHG)
+		
+		</script>
+	</body>
+
+
+</html>
