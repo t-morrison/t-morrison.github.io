@@ -68,6 +68,8 @@
 				.attr('text-anchor','middle')
 				.text('Top 10 Emitters in 2012 (based on graph and data from WRI)')
 			
+			var dataStack
+			
 		//START GRAPH	
 			
 			d3.csv('dataSorted2.csv', function(data) {
@@ -113,7 +115,7 @@
 			//CREATE PLOT
 				
 				
-				var dataStack = stack.keys(Object.keys(dat[0]).slice(2))(dat)
+				dataStack = stack.keys(Object.keys(dat[0]).slice(2))(dat)
 				
 				svg.selectAll('.serie')
 					.data(dataStack)
@@ -121,12 +123,12 @@
 					.append('g')
 						.attr('class','serie')	
 						.attr('name', function(d){return d.key.replace(/ /g,'')})								//set class of g rect element equal to class of 
-						.attr('fill',function(d){return z(d.key)})
+						.attr('fill',function(d){console.log(d.key); return z(d.key)})
 					.selectAll('rect')
 						.data(function(d){return d})
 						.enter()
 						.append('rect')
-							.attr('x', function(d) {return x(d.data.Type)})
+							.attr('x', function(d) {console.log(d.data.Type); return x(d.data.Type)})
 							.attr('y', function(d) {return y(d[1])})
 							.attr('height', function(d) {return y(d[0])-y(d[1])})
 							.attr('width', x.bandwidth())
