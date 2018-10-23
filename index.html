@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>T. Morrison</title>
+		<title>TRM</title>
 		<meta charset="utf-8">
 		 
 		<script src="https://d3js.org/d3.v4.min.js"></script>
@@ -22,34 +22,38 @@
     		<ul>
         		<li><a href="/">Home</a></li>
 	        	<li><a href="pages/about.html">About</a></li>
-        		<li><a href="pages/resume.html">Resume</a></li>
         		
     		</ul>
 		</nav>
 		
 		<div class="container">
     		<div class="blurb">
-        		<h2>Exploring R and other data analyis/viz tools</h2>
-				<h4>Interactive Maps</h4>
+        		<h2>Tommy Morrison</h2>
+				<h4>Geospatial</h4>
 				<ul>
 					<li><a href="/projects/d3/Maps/IronDomeGame.html">  Iron Dome: A D3.js geography game </a></li>
 					<li><a href="/projects/Leaflet/map.html">  D3 and Leaflet Map and Chart combo </a></li>
 					<li><a href="https://pwypusa.github.io/pages/gulf_explorer.html" target="_blank"> Gulf of Mexico Lease and Production Explorer (w/ Carto.js/Leaflet.js/R)</a></li>
-					<li><a href="/projects/pwyp_interactive.html"> Oil & Gas/Mining Company Disclosure Map (w/ Leaflet for R)</a></li>
+					<!-- <li><a href="/projects/pwyp_interactive.html"> Oil & Gas/Mining Company Disclosure Map (w/ Leaflet for R)</a></li> -->
 				</ul>
 				<h4>D3.js</h4>
 				<ul>
 					<li><a href="/projects/d3/WRI_graph.html">Top Ten Emitters: Interactive graph based on World Resources Institute visualization</a></li>
-					<li><a href="/projects/Project sample/Master.html">Multi-level bar graph with stacked groups, payments to governments data</a></li>
+					<!-- <li><a href="/projects/Project sample/Master.html">Multi-level bar graph with stacked groups, payments to governments data</a></li> -->
 					<li><a href="/projects/d3/nat_gas.html">Auto-scaling, adjustable bar graph with date axis, EIA data</a></li>
 					<li><a href="/projects/d3/test.html">D3.js SVG manipulation sample</a></li>
-				</ul>				
+				</ul>	
+				<h4>R Shiny</h4>
+				<ul>
+					<li><a href="http://apps.resourcegovernance.org/forecast-tracker/" target="_blank">IMF Forecast Tracker</a></li>
+					<li><a href="http://apps.resourcegovernance.org/pdf-table-extractor/" target="_blank">PDF Table Extractor</a></li>
+				</ul>
+				
 				<h4>R</h4>
 				<ul>					
-				    <li><a href="/projects/CFPB/CFPB3.html"> Wells Fargo and the $185 Million Complaints</a></li>
-					
-					<li><a href="/projects/Chicago_crime.html"> Chicago Crime Data</a></li>
-					<li><a href="/projects/CFPB/cfpbmap.html"> Mapping CFPB Complaint Data</a></li>
+				    <li><a href="/projects/CFPB/CFPB3.html"> Wells Fargo and the $185 Million Complaints</a></li>					
+					<!-- <li><a href="/projects/Chicago_crime.html"> Chicago Crime Data</a></li> -->
+					<!-- <li><a href="/projects/CFPB/cfpbmap.html"> Mapping CFPB Complaint Data</a></li> -->
 					<li><a href="/projects/CFPB/CFBP2.html"> Exploring CFPB Mortgage Complaints</a></li>
 					<li><a href="/projects/CFPB/CFPB1.html"> Exploring CFPB Payday Loan Complaints</a></li> 
 					<li><a href="/projects/energy_projects/dereg2.html"> Energy Market Deregulation in the US, pt. 2</a></li>
@@ -58,11 +62,7 @@
 					<li><a href="/projects/energy_projects/second_project.html"> US Energy Production, pt. 2</a></li>
 					<li><a href="/projects/energy_projects/first_project.html"> US Energy Production</a></li>
 				</ul>
-				<h4>Shiny (server-side applications with R)</h4>
-				<ul>
-					<li><a href="/projects/shiny_app_boem1.html"> Interactive BOEM Lease and Production Data Explorer</a></li>
-					<li><a href="/projects/shiny_app_useiti.html">Interactive Extractive Industry Data Explorer</a></li>
-				</ul>
+				
 				
 				
     		</div><!-- /.blurb -->
@@ -101,9 +101,9 @@
 			d3.select('svg')
 				.append('circle')
 				.attr('cx', '50%').attr('cy','5%').attr('r','5%').attr('fill','black')
-			var bounce = function () {d3.select('circle')
-										.transition()
-										
+			var bounce = function (start) {
+							d3.select('circle')
+										.transition()										
 										.duration(5000)
 										.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
 										.attr('cy','93%')
