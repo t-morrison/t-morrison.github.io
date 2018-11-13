@@ -11,7 +11,7 @@
 			#sidebar {
 				position: absolute;
 				right: 0;
-				width: 30%;
+				width: 100%;
 				height: 100%;
 				z-index: 100;
 			}
@@ -95,31 +95,100 @@
 									}
 			bulletPointColor()
 			
+			var count = 1
+			
 			d3.select('#sidebar')
 				.append('svg')
 				.attr('height','100%')
 				.attr('width','100%')
 			d3.select('svg')
 				.append('circle')
-				.attr('cx', '50%').attr('cy','5%').attr('r','5%').attr('fill','black')
-			var bounce = function (start) {
-							d3.select('circle')
-										.transition()										
-										.duration(5000)
-										.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
-										.attr('cy','93%')
-										.attr('r', Math.random() * 6 + '%')
-										.on('end', function() {
-											d3.select(this)
-												.transition()
-												.duration(5000)
-												.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
-												.attr('cy','5%')
-												.attr('r', Math.random() * 6 + '%')
-												.on('end', bounce);
-												})
-											}
-			bounce()
+				.attr('cx', '90%').attr('cy','5%').attr('r','1%').attr('fill','black').attr('opacity', .5)
+				.on('mouseover', function(){
+					d3.select(this)
+						//.attr('outline', 1)
+						.attr('stroke', 'black')
+						.attr('stroke-width', 5)
+				})
+				.on('mouseout', function(){
+					d3.select(this)
+						.attr('stroke', 'white')
+						.attr('stroke-width', 0)
+						//.attr('fill', 'red')
+				})
+				.on('click', function() {
+						if(count==1) {
+							console.log("count 1")
+							bounce(false)
+							count = 2
+							slide(true)
+							
+							
+							
+						} else {
+							console.log("count 2")
+							count = 1
+							slide(false)
+							bounce(true)
+						}											
+				})
+			var bounce = function (repeat) {
+			
+							if(repeat==true){
+								d3.select('circle')
+											.transition()										
+											.duration(5000)
+											.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
+											.attr('cy','93%')
+											.attr('r', Math.random() * 3 + '%')										
+											.on('end', function() {
+												d3.select(this)
+													.transition()
+													.duration(5000)
+													.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
+													.attr('cy','4.1%')
+													.attr('r', Math.random() * 3 + '%')
+													.on('end', function(){bounce(true)});
+											})
+							} else {
+								console.log("stop")
+							}
+						}
+			var slide = function (repeat) {
+							if(repeat==true){
+								d3.select('circle')
+											.transition()										
+											.duration(5000)
+											.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
+											.attr('cx','96%')
+											.attr('r', Math.random() * 3 + '%')										
+											.on('end', function() {
+												d3.select(this)
+													.transition()
+													.duration(5000)
+													.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
+													.attr('cx','3.%')
+													.attr('r', Math.random() * 3 + '%')
+													.on('end', function(){slide(true)});
+											})
+							} else {
+								console.log("stop")
+							}			
+			}
+		
+			bounce(true)
 		</script>
 	</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
