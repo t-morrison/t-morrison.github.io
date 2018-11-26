@@ -16,7 +16,7 @@ rss_cik <- data.table(
 ###
 #Any new CIK numbers?
 
-companies_current <- fread("C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/companies.csv", stringsAsFactors = FALSE)
+companies_current <- fread("data/companies.csv", stringsAsFactors = FALSE)
 
 
 new_cik <- rss_cik[!compare_cik %in% companies_current$cik]
@@ -26,7 +26,7 @@ new_cik <- rss_cik[!compare_cik %in% companies_current$cik]
 #Update log
 
 
-log_file <- fread("C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/log.csv")
+log_file <- fread("data/log.csv")
 
 
 if(nrow(new_cik)>0){
@@ -44,9 +44,9 @@ change_table <- data.table(
 )
 
 new_log <- rbind(log_file, change_table)
-write.csv(new_log, file="C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/log.csv", row.names=FALSE)
+write.csv(new_log, file="data/log.csv", row.names=FALSE)
 
-
+print(paste0("Added: ", nrow(new_cik)))
 
 
 
@@ -80,7 +80,7 @@ all_comp <- unique(rbind(companies_current, add))
 ###
 #Write to data file
 
-write.csv(all_comp, file="C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/companies.csv", row.names = FALSE)
+write.csv(all_comp, file="data/companies.csv", row.names = FALSE)
 
 
 

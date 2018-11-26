@@ -4,7 +4,7 @@ library(data.table); library(rvest)
 
 ###
 #Current companies
-companies_current <- fread("C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/companies.csv", stringsAsFactors = FALSE)
+companies_current <- fread("data/companies.csv", stringsAsFactors = FALSE)
 
 ###
 #Parsing edgar search result URLs
@@ -50,7 +50,7 @@ companies2 <- unique(rbind(companies, companies_current))
 ###
 #Write changes to log file
 
-log_file <- fread("C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/log.csv")
+log_file <- fread("data/log.csv")
 
 change <- companies[!cik %in% companies_current$cik]
 
@@ -69,12 +69,12 @@ change_table <- data.table(
 )
 
 new_log <- rbind(log_file, change_table)
-write.csv(new_log, file="C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/log.csv", row.names=FALSE)
+write.csv(new_log, file="data/log.csv", row.names=FALSE)
 
 
 ###
 #Rewrite companies to data file
-write.csv(companies2, file="C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/companies.csv", row.names = FALSE)
+write.csv(companies2, file="data/companies.csv", row.names = FALSE)
 rm(list=ls())
 
 
