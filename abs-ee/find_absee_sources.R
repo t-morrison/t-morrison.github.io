@@ -1,6 +1,6 @@
 #Get the ABS-EE filings for each deal
 #Run once
-library(data.table); library(rvest)l; library(feedeR)
+library(data.table); library(rvest); library(feedeR)
 
 sources_current <- fread("C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/sources.csv", stringsAsFactors = FALSE)
 

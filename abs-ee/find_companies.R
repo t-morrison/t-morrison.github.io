@@ -4,14 +4,14 @@ library(data.table); library(rvest)
 
 ###
 #Current companies
-companies_current <- read.csv("C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/companies.csv", stringsAsFactors = FALSE)
+companies_current <- fread("C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/companies.csv", stringsAsFactors = FALSE)
 
 ###
 #Parsing edgar search result URLs
 
 total <- as.numeric(html_text(html_node(read_html("https://www.sec.gov/cgi-bin/srch-edgar?text=abs-ee&first=2016&last=2018"), css="body > div > b:nth-child(3)")))
 total_times <- (total %/% 80)
-urls <- paste0("https://www.sec.gov/cgi-bin/srch-edgar?text=abs-ee&start=", c(1,((1:total_times)*80)+1), "&count=80&first=2016&last=2018")
+urls <- paste0("https://www.sec.gov/cgi-bin/srch-edgar?text=abs-ee&start=", c(1,((1:total_times)*80)+1), "&count=80&first=2016&last=2019")
 
 
 ###
@@ -30,9 +30,9 @@ for(i in 1:length(urls)) {
   tbl[, href:=href_tbl$href]
   tables[[i]] <- tbl
   print(i)
-}
+}; rm(href_tbl, t, n, tbl, doc)
 
-tables2 <- rbindlist(tables)
+tables2 <- rbindlist(tables); rm(tables)
 
 ###
 #Get the CIK from the href field in every company/href combo
@@ -44,10 +44,38 @@ companies[, deal_url:=paste0("https://www.sec.gov/cgi-bin/browse-edgar?CIK=", ci
 
 ###
 #Combine the new with the old
-companies <- unique(rbind(companies, companies_current))
+companies2 <- unique(rbind(companies, companies_current))
 
-write.csv(companies, file="C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/companies.csv", row.names = FALSE)
 
+###
+#Write changes to log file
+
+log_file <- fread("C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/log.csv")
+
+change <- companies[!cik %in% companies_current$cik]
+
+if(nrow(change)>0){
+  action <- paste0("New companies added: ", nrow(change))
+  new_comps <- paste0(change$Company, collapse = "; ")
+} else {
+  action <- "Nothing added"
+  new_comps <- ""
+}
+
+change_table <- data.table(
+  timestamp=as.character(Sys.time()),
+  action=action,
+  added=new_comps
+)
+
+new_log <- rbind(log_file, change_table)
+write.csv(new_log, file="C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/log.csv", row.names=FALSE)
+
+
+###
+#Rewrite companies to data file
+write.csv(companies2, file="C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/companies.csv", row.names = FALSE)
+rm(list=ls())
 
 
 
