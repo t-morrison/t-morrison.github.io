@@ -19,7 +19,7 @@ ciks <- unique(sources_current$cik)
 
 
 l <- list()
-for(i in 1:length(ciks)){
+for(i in 1:20){#length(ciks)){
   
   print(paste0("CIK: ", ciks[i]))
   x <- feedeR::feed.extract(
@@ -54,9 +54,11 @@ for(i in 1:length(ciks)){
 sources <- rbindlist(l)
 
 
+unique(rbind(sources, sources1))
 
+# sources1 <- copy(sources)
 
-write.csv(sources[, c('company', 'cik', 'date', 'absee_page', 'absee_link')], "C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/sources.csv", row.names = FALSE)
+write.csv(sources[, c('company', 'cik', 'date', 'absee_page', 'absee_link')], "C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/sources2.csv", row.names = FALSE)
 
 
 

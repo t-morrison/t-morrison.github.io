@@ -3,8 +3,19 @@ library(data.table); library(feedeR); library(rvest)
 
 
 rss <- feedeR::feed.extract("https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&CIK=&type=abs-ee&company=&dateb=&owner=include&start=0&count=80&output=atom")
+rss2 <- feedeR::feed.extract("https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&CIK=&type=abs-ee&company=&dateb=&owner=include&start=81&count=80&output=atom")
 rss <- as.data.table(rss$items)
+rss2 <- as.data.table(rss2$items)
 rss <- rss[link !="alternate" & link != "text/html"]
+
+if(nrow(rss2)>0){
+  rss2 <- rss2[link !="alternate" & link != "text/html"]
+  rss <- unique(rbind(rss, rss2))
+  
+}; rm(rss2)
+
+
+
 
 rss_cik <- data.table(
   cik = substr(rss$link, 40, 46),
@@ -20,6 +31,16 @@ companies_current <- fread("data/companies.csv", stringsAsFactors = FALSE)
 
 
 new_cik <- rss_cik[!compare_cik %in% companies_current$cik]
+
+
+###
+#Any new sources?
+
+all_sources <- fread("data/sources.csv")
+
+
+
+
 
 
 ###
@@ -84,7 +105,7 @@ write.csv(all_comp, file="data/companies.csv", row.names = FALSE)
 
 
 
-
+####
 
 
 
