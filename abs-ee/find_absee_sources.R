@@ -2,7 +2,9 @@
 #Run once
 library(data.table); library(rvest); library(feedeR)
 
-sources_current <- fread("C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/sources.csv", stringsAsFactors = FALSE)
+sources_current <- fread("data/sources.csv", stringsAsFactors = FALSE)
+companies <- fread("data/companies.csv")
+
 get_absee_link <- function(pre_link) {
   y <- read_html(pre_link)
   rvest::html_nodes(y, 'table')
@@ -14,12 +16,12 @@ get_absee_link <- function(pre_link) {
 ###
 #Loop through every company and pull RSS for ABS-EE filetypes
 ciks <- unique(sources_current$cik)
-
+ciks <- unique(companies$cik)
 
 
 
 l <- list()
-for(i in 1:20){#length(ciks)){
+for(i in 1:length(ciks)){
   
   print(paste0("CIK: ", ciks[i]))
   x <- feedeR::feed.extract(
@@ -54,11 +56,18 @@ for(i in 1:20){#length(ciks)){
 sources <- rbindlist(l)
 
 
-unique(rbind(sources, sources1))
+sources2 <- unique(rbind(sources, sources_current))
+
+
+##Which are not in our current source file?
+
+sources[!absee_link %in% sources_current$absee_link]
+
+
 
 # sources1 <- copy(sources)
 
-write.csv(sources[, c('company', 'cik', 'date', 'absee_page', 'absee_link')], "C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/sources2.csv", row.names = FALSE)
+write.csv(sources2[, c('company', 'cik', 'date', 'absee_page', 'absee_link')], "C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee/data/sources.csv", row.names = FALSE)
 
 
 
