@@ -27,7 +27,7 @@ if(nrow(rss)==0) {
   write.csv(new_log, file="data/log.csv", row.names=FALSE)
   stop("Exiting script; no new items")
 }
-print("x")
+
 
 rss <- rss[link !="alternate" & link != "text/html"]
 
@@ -58,11 +58,29 @@ new_cik <- rss_cik[!compare_cik %in% companies_current$cik]
 #Any new sources?
 all_sources <- fread("data/sources.csv")
 
+new_sources <- copy(rss[!link %in% all_sources$absee_page])
+
+if(nrow(new_sources)>0){
+  for(i in 1:nrow(new_sources)){
+  
+    new_sources[i, absee_link:=get_absee_link(link)]
+    new_sources[i, absee_page:=link]
+    new_sources[i, cik:=paste0("000", substr(link, 40, 46))]
+    new_sources[i, date2:=substr(as.character(date), 0, 10)]
+    cp <- companies_current[cik==new_sources[i]$cik]$Company
+    new_sources[i, company:=cp]
+  }; rm(cp)
+  new_sources <- new_sources[, c("company","cik","date2","absee_page","absee_link")]
+  setnames(new_sources, "date2","date")
+} else {
+  new_sources <- data.table("company"=NA, "cik"=NA, "date"=NA, "absee_page"=NA, "absee_link"=NA)
+}
 
 
+#Write back to sources file
+sources_add <- unique(rbind(all_sources, new_sources))[!is.na(cik)]
 
-
-
+write.csv(sources_add, file = "data/sources.csv", row.names = FALSE)
 
 ###
 #Update log
@@ -70,18 +88,18 @@ all_sources <- fread("data/sources.csv")
 
 log_file <- fread("data/log.csv")
 
-# if(nrow(new_source)>0){
-#   action1 <- paste0("New sources added: ", nrow(new_source))
-# } else {
-#   action1 <- "No sources added"
-# }
+if(nrow(new_sources[!is.na(cik)])>0){
+  action1 <- paste0("New sources added: ", nrow(new_sources))
+} else {
+  action1 <- "No sources added"
+}
 
 
 if(nrow(new_cik)>0){
   action2 <- paste0("New companies added: ", nrow(new_cik))
   new_comps <- paste0(new_cik$compare_cik, collapse = "; ")
 } else {
-  action <- "No companies added"
+  action2 <- "No companies added"
   new_comps <- ""
 }
 
@@ -103,7 +121,7 @@ print(paste0("Added: ", nrow(new_cik)))
 ###
 #If there are new companies, find company name and url
 if(nrow(new_cik)==0) {
-  stop() 
+  stop("No new companies to add") 
 }
 
 l <- list()
