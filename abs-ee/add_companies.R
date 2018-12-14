@@ -70,11 +70,11 @@ all_sources <- fread("data/sources.csv")
 
 log_file <- fread("data/log.csv")
 
-if(nrow(new_source)>0){
-  action1 <- paste0("New sources added: ", nrow(new_source))
-} else {
-  action1 <- "No sources added"
-}
+# if(nrow(new_source)>0){
+#   action1 <- paste0("New sources added: ", nrow(new_source))
+# } else {
+#   action1 <- "No sources added"
+# }
 
 
 if(nrow(new_cik)>0){
