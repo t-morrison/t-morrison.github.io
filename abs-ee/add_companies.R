@@ -55,6 +55,47 @@ new_cik <- rss_cik[!compare_cik %in% companies_current$cik]
 
 
 ###
+#If there are new companies, find company name and url
+if(nrow(new_cik)==0) {
+  # stop("No new companies to add") 
+} else {
+  l <- list()
+  
+  for(i in 1:nrow(new_cik)){
+    rss <- feedeR::feed.extract(paste0("https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=000", new_cik[i]$cik, "&type=&dateb=&owner=include&start=0&count=40&output=atom"))
+    
+    comp <- trimws(substr(rss$title, 0, nchar(rss$title)-12))
+    
+    l[[i]] <- data.table(
+      Company = comp,
+      cik = new_cik[i]$compare_cik,
+      deal_url = paste0("https://www.sec.gov/cgi-bin/browse-edgar?CIK=000", new_cik[i]$cik, "&action=getcompany")
+    )
+    print(i)
+  }; rm(comp)
+  
+  add <- rbindlist(l)
+  
+  all_comp <- unique(rbind(companies_current, add))
+  
+  ###
+  #Write to data file
+  
+  write.csv(all_comp, file="data/companies.csv", row.names = FALSE)
+  
+}
+
+
+companies_current <- fread("data/companies.csv", stringsAsFactors = FALSE)
+
+####
+
+
+
+
+
+
+###
 #Any new sources?
 all_sources <- fread("data/sources.csv")
 
@@ -69,6 +110,7 @@ if(nrow(new_sources)>0){
     new_sources[i, date2:=substr(as.character(date), 0, 10)]
     cp <- companies_current[cik==new_sources[i]$cik]$Company
     new_sources[i, company:=cp]
+    print(i)
   }; rm(cp)
   new_sources <- new_sources[, c("company","cik","date2","absee_page","absee_link")]
   setnames(new_sources, "date2","date")
@@ -117,40 +159,6 @@ print(paste0("Added: ", nrow(new_cik)))
 
 
 
-
-###
-#If there are new companies, find company name and url
-if(nrow(new_cik)==0) {
-  stop("No new companies to add") 
-}
-
-l <- list()
-
-for(i in 1:nrow(new_cik)){
-  rss <- feedeR::feed.extract(paste0("https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=000", new_cik[i]$cik, "&type=&dateb=&owner=include&start=0&count=40&output=atom"))
-  
-  comp <- trimws(substr(rss$title, 0, nchar(rss$title)-12))
-  
-  l[[i]] <- data.table(
-    Company = comp,
-    cik = new_cik[i]$compare_cik,
-    deal_url = paste0("https://www.sec.gov/cgi-bin/browse-edgar?CIK=000", new_cik[i]$cik, "&action=getcompany")
-  )
-  print(i)
-}; rm(rss, comp)
-
-add <- rbindlist(l)
-
-all_comp <- unique(rbind(companies_current, add))
-
-###
-#Write to data file
-
-write.csv(all_comp, file="data/companies.csv", row.names = FALSE)
-
-
-
-####
 
 
 

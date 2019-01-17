@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+	
+	<head>
+		<meta charset="utf-8">
+		<title>ABS-EE Filings</title>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+			
+	</head>
+
+	<body>
+		<div>
+			<p>ABS-EE filings for asset-backed securities filed on the U.S. Securities and Exchange Commission's online filing service in XML format.</p>
+			
+		</div>		
+		
+		<div>Data from SEC EDGAR filing service: <a href="https://www.sec.gov/edgar.shtml" target="_blank">link</a> </div>
+		
+		<script>
+		
+			var dat
+			var companies = []
+			var company
+			var sources = []
+			
+			d3.csv("data/companies.csv", function(data){
+				dat = data
+				
+				
+				for(i=0; i<dat.length; i++){
+					companies[i] = dat[i].Company
+				}				
+			
+				d3.select('body')
+					.append('select')
+					.attr('id', 'company_dropdown')
+					.attr('class','select')
+					//.on('change', onchange)
+					.selectAll('option')
+						.data(companies)
+						.enter()
+						.append('option')
+							.text(function (d) {
+								return d
+							})
+					
+				d3.select("#company_dropdown")
+					.on('change', function(){
+						d3.select("#source_dropdown").remove()
+					
+						console.log("change")
+						d3.csv('data/sources.csv', function(data2){
+							dat2 = data2							
+							sources = dat2.filter(function(d){ return d.company == d3.select('#company_dropdown').node().value })
+							
+							d3.select('body')
+								.append('select')
+								.attr('id', 'source_dropdown')
+								.attr('class','select')
+								//.on('change', onchange)
+								.selectAll('option')
+									.data(sources)
+									.enter()
+									.append('option')
+										.text(function (d) {
+											return d.date
+										})
+							
+							
+						})
+					})
+				
+				//d3.csv('data/sources.csv', function(data2){
+				//	dat2 = data2
+				//	
+				//	sources = dat2.filter(function(d){ return d.company == d3.select('#company_dropdown').node().value })
+				//	
+				//})
+			
+				
+			
+			})
+			
+			
+
+			
+			
+			
+			
+			
+			
+		
+		</script>
+	</body>
+
+
+</html>
