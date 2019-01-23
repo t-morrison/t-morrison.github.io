@@ -10,6 +10,15 @@
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
 		<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 		
+		<style>
+			body {background-color: white;}
+			p { 
+				font-family: sans-serif;
+				line-height: 22px;
+			}
+			table { font-family: sans-serif;}
+		</style>
+		
 	</head>
 
 	<body>
@@ -24,6 +33,12 @@
 				This page is updated in an automated ETL pipeline run on a remote AWS server. The pipeline uses Github as an updateable database by way of daily commits from the remote server.
 				The script which locates new data is written in R, and takes advantage of EDGAR's RSS feed to locate filings of the "ABS-EE" type. These scripts and the data files can be found 
 				<a href="https://github.com/moman822/moman822.github.io/tree/master/abs-ee" target="_blank">here</a>.
+				<br><br>
+				Updates to this project will include normalized data collection of monthly servicer reports, showing asset performance, and other projects using R-Shiny to analyze the loan-level data
+				itself.
+				<br><br>
+				
+				
 			</p>
 			
 		</div>		
@@ -49,7 +64,7 @@
 				for(i=0; i<dat.length; i++){
 					companies[i] = dat[i].Company
 				}				
-			
+				companies.unshift("")
 				d3.select('#top')
 					.append('select')
 					.attr('id', 'company_dropdown')
