@@ -44,7 +44,7 @@ if(nrow(rss2)>0){
 rss_cik <- data.table(
   cik = substr(rss$link, 40, 46),
   compare_cik = as.character(paste0("000", substr(rss$link, 40, 46)))
-)
+)[, cik:=gsub("/", "", cik)][, compare_cik:=gsub("/", "", compare_cik)]
 
 
 
@@ -52,6 +52,7 @@ rss_cik <- data.table(
 #Any new CIK numbers?
 companies_current <- fread("data/companies.csv", stringsAsFactors = FALSE)
 new_cik <- rss_cik[!compare_cik %in% companies_current$cik]
+
 
 
 ###
@@ -62,9 +63,9 @@ if(nrow(new_cik)==0) {
   l <- list()
   
   for(i in 1:nrow(new_cik)){
-    rss <- feedeR::feed.extract(paste0("https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=000", new_cik[i]$cik, "&type=&dateb=&owner=include&start=0&count=40&output=atom"))
+    rss2 <- feedeR::feed.extract(paste0("https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=000", new_cik[i]$cik, "&type=&dateb=&owner=include&start=0&count=40&output=atom"))
     
-    comp <- trimws(substr(rss$title, 0, nchar(rss$title)-12))
+    comp <- trimws(substr(rss2$title, 0, nchar(rss2$title)-12))
     
     l[[i]] <- data.table(
       Company = comp,
