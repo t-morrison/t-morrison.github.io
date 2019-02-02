@@ -1,4 +1,7 @@
 library(data.table); library(feedeR); library(rvest)
+
+# setwd("C:/Users/TRM/Documents/GitHub/moman822.github.io/abs-ee")
+
 get_absee_link <- function(pre_link) {
   y <- read_html(pre_link)
   rvest::html_nodes(y, 'table')
@@ -42,9 +45,9 @@ if(nrow(rss2)>0){
 
 
 rss_cik <- data.table(
-  cik = substr(rss$link, 40, 46),
-  compare_cik = as.character(paste0("000", substr(rss$link, 40, 46)))
-)[, cik:=gsub("/", "", cik)][, compare_cik:=gsub("/", "", compare_cik)]
+  cik = substr(rss$link, 41, 47),
+  compare_cik = as.character(paste0("000", substr(rss$link, 41, 47)))
+)#[, cik:=gsub("/", "", cik)][, compare_cik:=gsub("/", "", compare_cik)]
 
 
 
@@ -107,7 +110,7 @@ if(nrow(new_sources)>0){
   
     new_sources[i, absee_link:=get_absee_link(link)]
     new_sources[i, absee_page:=link]
-    new_sources[i, cik:=paste0("000", substr(link, 40, 46))]
+    new_sources[i, cik:=paste0("000", substr(link, 41, 47))]
     new_sources[i, date2:=substr(as.character(date), 0, 10)]
     cp <- companies_current[cik==new_sources[i]$cik]$Company
     new_sources[i, company:=cp]

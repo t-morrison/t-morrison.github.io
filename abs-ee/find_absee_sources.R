@@ -2,6 +2,8 @@
 #Run once
 library(data.table); library(rvest); library(feedeR)
 
+
+
 sources_current <- fread("data/sources.csv", stringsAsFactors = FALSE)
 companies <- fread("data/companies.csv")
 
@@ -55,6 +57,8 @@ for(i in 1:length(ciks)){
 
 sources <- rbindlist(l)
 
+#sources_current should already have https links
+# sources_current[, absee_page:=gsub("http", "https", absee_page)][, absee_link:=gsub("http", "https", absee_link)]
 
 sources2 <- unique(rbind(sources, sources_current))
 
