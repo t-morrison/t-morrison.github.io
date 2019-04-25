@@ -76,7 +76,7 @@ if(nrow(new_cik)==0) {
     l[[i]] <- data.table(
       Company = comp,
       cik = new_cik[i]$compare_cik,
-      deal_url = paste0("https://www.sec.gov/cgi-bin/browse-edgar?CIK=000", new_cik[i]$cik, "&action=getcompany")
+      deal_url = paste0("https://www.sec.gov/cgi-bin/browse-edgar?CIK=000", cik_in, "&action=getcompany")
     )
     print(i)
   }; rm(comp)
