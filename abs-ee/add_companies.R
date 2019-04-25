@@ -66,7 +66,10 @@ if(nrow(new_cik)==0) {
   l <- list()
   
   for(i in 1:nrow(new_cik)){
-    rss2 <- feedeR::feed.extract(paste0("https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=000", new_cik[i]$cik, "&type=&dateb=&owner=include&start=0&count=40&output=atom"))
+    cik_in <- new_cik[i]$cik
+    cik_in <- gsub("/", "", cik_in)
+    
+    rss2 <- feedeR::feed.extract(paste0("https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=000", cik_in, "&type=&dateb=&owner=include&start=0&count=40&output=atom"))
     
     comp <- trimws(substr(rss2$title, 0, nchar(rss2$title)-12))
     
