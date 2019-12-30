@@ -1,0 +1,7 @@
+name,project,section,type,path
+EDGAR Asset Backed Security Data Pipeline,edgar_pipeline,cloud,path,abs-ee/absee.html
+IMF Forecast Tracker,imf_forecast_tracker,shiny,link,http://apps.resourcegovernance.org/forecast-tracker/
+PDF Table Extractor,pdf_table_extractor,shiny,link,http://apps.resourcegovernance.org/pdf-table-extractor/
+Iron Dome: A d3.js game,iron_dome,geospatial,path,projects/d3/Maps/IronDomeGame.html
+d3 and Leaflet Combo,d3_and_leaflet,geospatial,path,projects/Leaflet/map.html
+Gulf of Mexico Lease and Production Explorer,lease_explorer,geospatial,link,https://pwypusa.github.io/pages/gulf_explorer.html
