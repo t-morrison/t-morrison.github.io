@@ -1,7 +1,7 @@
-name,project,section,type,path,coolness
-EDGAR Asset Backed Security Data Pipeline,edgar_pipeline,cloud,path,abs-ee/absee.html,5
-IMF Forecast Tracker,imf_forecast_tracker,shiny,link,http://apps.resourcegovernance.org/forecast-tracker/,5
-PDF Table Extractor,pdf_table_extractor,shiny,link,http://apps.resourcegovernance.org/pdf-table-extractor/,4
-Iron Dome: A d3.js game,iron_dome,geospatial,path,projects/d3/Maps/IronDomeGame.html,4
-d3 and Leaflet Combo,d3_and_leaflet,geospatial,path,projects/Leaflet/map.html,2
-Gulf of Mexico Lease and Production Explorer,lease_explorer,geospatial,link,https://pwypusa.github.io/pages/gulf_explorer.html,3
+name,project,section,type,coolness,path
+EDGAR Asset Backed Security Data Pipeline,edgar_pipeline,cloud,path,5,abs-ee/absee.html
+IMF Forecast Tracker,imf_forecast_tracker,shiny,link,5,http://apps.resourcegovernance.org/forecast-tracker/
+PDF Table Extractor,pdf_table_extractor,shiny,link,4,http://apps.resourcegovernance.org/pdf-table-extractor/
+Iron Dome: A d3.js game,iron_dome,geospatial,path,4,projects/d3/Maps/IronDomeGame.html
+d3 and Leaflet Combo,d3_and_leaflet,geospatial,path,2,projects/Leaflet/map.html
+Gulf of Mexico Lease and Production Explorer,lease_explorer,geospatial,link,3,https://pwypusa.github.io/pages/gulf_explorer.html
