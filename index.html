@@ -84,109 +84,94 @@
 				//	.attr('y', function(d, i){return yScale(i) })
 				//	.html(function(d){return d.name})
 					
-				var width = 450
-				var height = 450
-				
-				var colorScale = d3.scaleOrdinal()
-					.domain(d3.map(dat, function(d){return d.section;}).keys())
-					.range([ "#F8766D", "#00BA38", "#619CFF"])
-				
-				var xScale2 = d3.scaleOrdinal()
-					.domain(d3.map(dat, function(d){return d.section;}).keys())
-					.range([50, 200, 340])
-				
-				
-				var svg = d3.select("#plot")
-				  .append("svg")
-					.attr("width", 450)
-					.attr("height", 450)
+				var color = d3.scaleOrdinal()
+				.domain(["Asia", "Europe", "Africa", "Oceania", "Americas"])
+				.range(d3.schemeSet1);
 
-				// create dummy data -> just one element per circle
-				//var data = [{ "name": "A" }, { "name": "B" }, { "name": "C" }, { "name": "D" }, { "name": "E" }, { "name": "F" }, { "name": "G" }, { "name": "H" }]
+			  // Size scale for countries
+				var size = d3.scaleLinear()
+					.domain([0, 1400000000])
+					.range([7,55])  // circle will be between 7 and 55 px wide
 
-				//Initialize the circle: all located at the center of the svg area
+			  // create a tooltip
+				var Tooltip = d3.select("#my_dataviz")
+					.append("div")
+					.style("opacity", 0)
+					.attr("class", "tooltip")
+					.style("background-color", "white")
+					.style("border", "solid")
+					.style("border-width", "2px")
+					.style("border-radius", "5px")
+					.style("padding", "5px")
+
+			  // Three function that change the tooltip when user hover / move / leave a cell
+				var mouseover = function(d) {
+					Tooltip
+					.style("opacity", 1)
+				}
+				var mousemove = function(d) {
+					Tooltip
+					  .html('<u>' + d.key + '</u>' + "<br>" + d.value + " inhabitants")
+					  .style("left", (d3.mouse(this)[0]+20) + "px")
+					  .style("top", (d3.mouse(this)[1]) + "px")
+				}
+				var mouseleave = function(d) {
+					Tooltip
+					.style("opacity", 0)
+				}
+
+			  // Initialize the circle: all located at the center of the svg area
 				var node = svg.append("g")
-				  .selectAll("circle")
-				  .data(dat)
-				  .enter()
-				  .append("circle")
-					.attr("r", 29)
-					.attr("cx", width / 2)
-					.attr("cy", height / 2)
-					.style("fill", function(d){ return colorScale(d.section)})
-					.style("fill-opacity", 0.8)
-					.attr("stroke", "black")
-					.style("stroke-width", 4)
-					.on('mouseover', function(d){
-						
-						d3.select(this)
-							.attr('stroke', 'blue')
-							.append('text')
-								//.attr("dx", function(d){return -20})
-								.text(function(d){return d.name})
-						
-					})
-					.on('mouseout', function(d){
-						
-						d3.select(this)
-							.attr('stroke', 'black')
-						
-					})
-					
-                var simulation = d3.forceSimulation()
-					.force("center", d3.forceCenter().x(width / 2).y(height / 2)) // Attraction to the center of the svg area
-					.force("charge", d3.forceManyBody().strength(0.5)) // Nodes are attracted one each other of value is > 0
-					.force("collide", d3.forceCollide().strength(.01).radius(30).iterations(1)) // Force that avoids circle overlapping
+					.selectAll("circle")
+					.data(data)
+					.enter()
+					.append("circle")
+					  .attr("class", "node")
+					  .attr("r", function(d){ return size(d.value)})
+					  .attr("cx", width / 2)
+					  .attr("cy", height / 2)
+					  .style("fill", function(d){ return color(d.region)})
+					  .style("fill-opacity", 0.8)
+					  .attr("stroke", "black")
+					  .style("stroke-width", 1)
+					  .on("mouseover", mouseover) // What to do when hovered
+					  .on("mousemove", mousemove)
+					  .on("mouseleave", mouseleave)
+					  .call(d3.drag() // call specific function when circle is dragged
+						   .on("start", dragstarted)
+						   .on("drag", dragged)
+						   .on("end", dragended));
 
-				// Features of the forces applied to the nodes:
-				var simulation2 = d3.forceSimulation()
-					.force("x", d3.forceX().strength(0.5).x( function(d){ return xScale2(d.section) } ))
-					.force("y", d3.forceY().strength(0.1).y( height/2 ))
-					//.force("center", d3.forceCenter().x(width / 2).y(height / 2)) // Attraction to the center of the svg area
-					//.force("charge", d3.forceManyBody().strength(1)) // Nodes are attracted one each other of value is > 0
-					//.force("collide", d3.forceCollide().strength(.1).radius(32).iterations(1)) // Force that avoids circle overlapping
-				
-				
-				
-				
-				// Apply these forces to the nodes and update their positions.
-				// Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
+			  // Features of the forces applied to the nodes:
+				var simulation = d3.forceSimulation()
+				  .force("center", d3.forceCenter().x(width / 2).y(height / 2)) // Attraction to the center of the svg area
+				  .force("charge", d3.forceManyBody().strength(.1)) // Nodes are attracted one each other of value is > 0
+				  .force("collide", d3.forceCollide().strength(.2).radius(function(d){ return (size(d.value)+3) }).iterations(1)) // Force that avoids circle overlapping
+
+			  // Apply these forces to the nodes and update their positions.
+			  // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
 				simulation
-					.nodes(dat)
-					.on("tick", function(d){
-					  node
-						  .attr("cx", function(d){ return d.x; })
-						  .attr("cy", function(d){ return d.y; })
-					})
-				
-				separate = function(){
-					if(state == true){
-						console.log("state==true, returning to separate position")
-						
-						simulation2
-							.nodes(dat)
-							.on("tick", function(d){
-							  node
-								  .attr("cx", function(d){ return d.x; })
-								  .attr("cy", function(d){ return d.y; })
-							})
-						
-						state = false
-					} else{
-						console.log("state==false, returning to original position")
-						
-						simulation
-							.nodes(dat)
-							.on("tick", function(d){
-							  node
-								  .attr("cx", function(d){ return d.x; })
-								  .attr("cy", function(d){ return d.y; })
-							})
-							
-							state = true
-					}
-					
-									
+				  .nodes(data)
+				  .on("tick", function(d){
+					node
+						.attr("cx", function(d){ return d.x; })
+						.attr("cy", function(d){ return d.y; })
+				  });
+
+			  // What happens when a circle is dragged?
+				function dragstarted(d) {
+					if (!d3.event.active) simulation.alphaTarget(.03).restart();
+					d.fx = d.x;
+					d.fy = d.y;
+				}
+				function dragged(d) {
+					d.fx = d3.event.x;
+					d.fy = d3.event.y;
+				}
+				function dragended(d) {
+					if (!d3.event.active) simulation.alphaTarget(.03);
+					d.fx = null;
+					d.fy = null;
 				}
 			
 			})			
