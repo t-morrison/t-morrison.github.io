@@ -23,44 +23,24 @@
 		
 		<div id='list'></div>
 		<div id='plot'></div>
-		<div id='button'><button type="button" onclick="separate()">Separate</button></div>
 		
 		<div> Some more stuff down here </div>
 		
 		<script>
 		
 			var dat
-			var separate
 			
-			var state = true
-			
-			
-			var h = 400
-			var w = 1000
-			var xpad = 100  //x in pixels
-			var ypad = 20 //y is in pixels
-			var barpad = .25
-			
-			var heightIn
-			var widthIn
+			var width = 460
+			var height = 460
+
+			// append the svg object to the body of the page
+			var svg = d3.select("#plot")
+			  .append("svg")
+				.attr("width", width)
+				.attr("height", height)
 			
 			d3.csv('data.csv', function(data) {
-				console.log(data)
 				dat = data
-				
-				
-				var xScale = d3.scaleLinear()
-							.domain([0,dat.length])
-							.range([xpad, w-xpad])
-							
-				var yScale = d3.scaleLinear()
-								.domain([0, dat.length])
-								.range([h-ypad, 0])				
-				
-				var yAxis = d3.axisLeft(yScale)
-				var xAxis = d3.axisBottom(xScale)
-				
-				
 				
 				
 				d3.select('#list').append('ul')
@@ -70,34 +50,22 @@
 					.append('li')
 					.html(function(d){return '<b>'+d.name+'</b>'})
 				
-				//d3.select('#plot').style('width','100%').append('svg').attr('width', w).attr('height',h)
-				//.selectAll('circle')
-				//.data(dat)
-				//.enter()
-				////.append('circle')
-				////	.attr('fill','black')				  
-				////	.attr('cx', function(d, i){ return xScale(i) })
-				////	.attr('cy', function(d, i){return yScale(i) })
-				////	.attr('r', 5)
-				//.append('text')
-				//	.attr('x', function(d, i){ return xScale(i) })
-				//	.attr('y', function(d, i){return yScale(i) })
-				//	.html(function(d){return d.name})
-					
-				var color = d3.scaleOrdinal()
-				.domain(["Asia", "Europe", "Africa", "Oceania", "Americas"])
-				.range(d3.schemeSet1);
-
-			  // Size scale for countries
+				
+				var colorScale = d3.scaleOrdinal()
+					.domain(d3.map(dat, function(d){return d.section;}).keys())
+					.range(["gold", "blue", "green", "yellow", "black", "grey", "darkgreen", "pink", "brown", "slateblue", "grey1", "orange"])
+					//.range(d3.schemeSet1);
+				
 				var size = d3.scaleLinear()
-					.domain([0, 1400000000])
+					.domain([0, 6])
 					.range([7,55])  // circle will be between 7 and 55 px wide
-
+				
 			  // create a tooltip
-				var Tooltip = d3.select("#my_dataviz")
+				var Tooltip = d3.select("#plot")
 					.append("div")
 					.style("opacity", 0)
 					.attr("class", "tooltip")
+					.style('position', 'absolute')
 					.style("background-color", "white")
 					.style("border", "solid")
 					.style("border-width", "2px")
@@ -111,26 +79,28 @@
 				}
 				var mousemove = function(d) {
 					Tooltip
-					  .html('<u>' + d.key + '</u>' + "<br>" + d.value + " inhabitants")
-					  .style("left", (d3.mouse(this)[0]+20) + "px")
-					  .style("top", (d3.mouse(this)[1]) + "px")
+					  .html('<u>' + d.name + '</u>')
+					  .style("left",(d3.mouse(this)[0]) + "px")
+					  .style("top", (d3.mouse(this)[1]+130) + "px")
+					  //.style("left", (d3.event.pageX) + "px")		
+					  //.style("top", (d3.event.pageY - 28) + "px")
 				}
 				var mouseleave = function(d) {
 					Tooltip
 					.style("opacity", 0)
 				}
 
-			  // Initialize the circle: all located at the center of the svg area
+				// Initialize the circle: all located at the center of the svg area
 				var node = svg.append("g")
 					.selectAll("circle")
-					.data(data)
+					.data(dat)
 					.enter()
 					.append("circle")
 					  .attr("class", "node")
-					  .attr("r", function(d){ return size(d.value)})
+					  .attr("r", function(d){ return size(d.coolness)})
 					  .attr("cx", width / 2)
 					  .attr("cy", height / 2)
-					  .style("fill", function(d){ return color(d.region)})
+					  .style("fill", function(d){ return colorScale(d.section)})
 					  .style("fill-opacity", 0.8)
 					  .attr("stroke", "black")
 					  .style("stroke-width", 1)
@@ -146,12 +116,12 @@
 				var simulation = d3.forceSimulation()
 				  .force("center", d3.forceCenter().x(width / 2).y(height / 2)) // Attraction to the center of the svg area
 				  .force("charge", d3.forceManyBody().strength(.1)) // Nodes are attracted one each other of value is > 0
-				  .force("collide", d3.forceCollide().strength(.2).radius(function(d){ return (size(d.value)+3) }).iterations(1)) // Force that avoids circle overlapping
+				  .force("collide", d3.forceCollide().strength(.2).radius(60).iterations(1)) // Force that avoids circle overlapping
 
 			  // Apply these forces to the nodes and update their positions.
 			  // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
 				simulation
-				  .nodes(data)
+				  .nodes(dat)
 				  .on("tick", function(d){
 					node
 						.attr("cx", function(d){ return d.x; })
