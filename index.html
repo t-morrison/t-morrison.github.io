@@ -66,6 +66,7 @@
 
 			
 			var dat
+			var links
 			var groupScale		
 						
 			var width = document.documentElement.clientWidth * (2/3)
@@ -81,6 +82,9 @@
 			var test
 			
 			
+			d3.csv('links.csv', function(data) {
+				links = data
+			})
 			
 			d3.csv('data.csv', function(data) {
 				console.log(data)
@@ -185,32 +189,64 @@
 				
 				size = d3.scaleLinear()
 					.domain([0, 6])
-					.range([7,60])
+					.range([7,40])
 		
 		//=================================================================================================
 		//=================================================================================================	  
 		
-				test = function() {
-					console.log('test')
-					
-					node
-					
-					
-				}
 				
 		//=================================================================================================
 		//=================================================================================================
+				
+				var link = svg.append('g')
+					.selectAll("line")
+					.data(links)
+					.enter()
+					.append("line")
+					  .style("stroke", "black")
+				
+				
 				node = svg.append("g")
 					.selectAll("circle")
 					.data(dat)
 					.enter()
-					.append("circle")
-					  .attr("class", "node")
+					.append("g")
+					//  .attr("class", "node")
+					.attr("class", function(d) {
+						return d.shape + " node";
+					})
+					.call(d3.drag()
+					   .on("start", dragstarted)
+					   .on("drag", dragged)
+					   .on("end", dragended)) 
+				
+				
+				var rh = 70
+				var rw = 70
+				
+				d3.selectAll('.rect').append('rect')
+					.attr('width', rw)
+					.attr('height', rh)
+					.attr('fill', 'white')
+					.attr('stroke', 'black')
+					.attr('x', -rw/2)
+					.attr('y', -rh/2)
+					.attr('rx', 5)
+					.attr('ry', 5)
+				
+				d3.selectAll('.rect').append('text')
+					.attr('x', 0)
+					.attr("y", 4)
+					.style("text-anchor", "middle")
+					.html(function(d){ return ''+d.name+'' })
+					//.html(function(d){ return '<a href="'+d.path+'" target="_blank">' +d.name+'</a>' })
+				
+				d3.selectAll('.circle').append('circle')
 					  .attr("r", function(d){ return size(d.coolness)})
-					  .attr("cx", width / 2)
-					  .attr("cy", height / 2)
+					  //.attr("cx", width / 2)
+					  //.attr("cy", height / 2)
 					  .style("fill", function(d){ return colorScale(d.section)})
-					  .style("fill-opacity", 0.8)
+					  .style("fill-opacity", 1)
 					  .attr("stroke", "black")
 					  .style("stroke-width", 1)
 					  .on("mouseover", function(d){
@@ -222,11 +258,12 @@
 								.style('stroke-width', 3)
 					  })
 					  .on("mousemove", function(d){
+							
 							Tooltip
 							  .html('<b>' + d.name + '</b><br><i>click to open</i><br>'+d.blurb)
-							  .style("left",(d3.mouse(this)[0]+20) + "px")
-							  .style("top", (d3.mouse(this)[1]+100) + "px")	
-						
+							  .style("left",(d3.event.pageX+10+"px"))//d3.mouse(this)[0]+400) + "px")
+							  .style("top", (d3.event.pageY+"px"))//d3.mouse(this)[1]+height) + "px")	
+							
 					  })
 					  .on("mouseleave", function(d){
 							Tooltip
@@ -244,31 +281,59 @@
 							.style('opacity', .5)
 						
 					  })
-					.call(d3.drag()
-					   .on("start", dragstarted)
-					   .on("drag", dragged)
-					   .on("end", dragended))
 					
+				
+				
+				
+				
 			  // Features of the forces applied to the nodes:
 				simulation = d3.forceSimulation()
-					.force("x", d3.forceX().strength(0.9).x( function(d){ return groupScale(d.section) } ))
+					.force("link", d3.forceLink().id(function(d) { return d.id; }))
+					//.force("x", d3.forceX().strength(0.9).x( function(d){ return groupScale(d.section) } ))
 					//.force("y", d3.forceY().strength(0.4).y( height/2 ))
 					.force("center", d3.forceCenter().x(width / 2).y(height / 2)) // Attraction to the center of the svg area
-					.force("charge", d3.forceManyBody().strength(.1)) // Nodes are attracted one each other of value is > 0
-					.force("collide", d3.forceCollide().strength(.2).radius(60).iterations(1)) // Force that avoids circle overlapping
-				  
+					.force("charge", d3.forceManyBody()
+						.strength(-400)
+						.theta(0.1)
+						.distanceMax(350)
+					)//.strength(.1)) // Nodes are attracted one each other of value is > 0
+					.velocityDecay(0.9)
+					.force("collide", d3.forceCollide().strength(1).radius(60).iterations(1)) // Force that avoids circle overlapping
+					//.force("center", d3.forceCenter(width / 2, height / 2));
+					
+				
 				
 			  ////Apply these forces to the nodes and update their positions.
 			  // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
 				simulation
 					.nodes(dat)
 					.on("tick", function(d){
-						node
-							.attr("cx", function(d){ return d.x; })
-							.attr("cy", function(d){ return d.y; })
+						var radius = 40
+						node.attr("transform", function (d) {							
+							var xpos = Math.max(radius, Math.min(width - radius, d.x))							
+							var ypos = Math.max(radius, Math.min(height - radius, d.y))
+							return "translate(" + xpos + "," + ypos + ")";
+						})
+						
+						link
+							.attr("x1", function(d) { return Math.max(radius, Math.min(width - radius, d.source.x))})//d.source.x; })
+							.attr("y1", function(d) { return Math.max(radius, Math.min(width - radius, d.source.y))})//d.source.y; })
+							.attr("x2", function(d) { return Math.max(radius, Math.min(width - radius, d.target.x))})//d.target.x; })
+							.attr("y2", function(d) { return Math.max(radius, Math.min(width - radius, d.target.y))})//d.target.y; });
+						//node
+						//	.attr("cx", function(d){ return d.x; })
+						//	.attr("cy", function(d){ return d.y; })
 							
+						//node.attr("transform", function (d) {
+						//	return "translate(" + d.x + "," + d.y + ")";
+						//});					
+						
 					})
-
+				
+				simulation.force("link")
+					.links(links)
+					
+				
 			  // What happens when a circle is dragged?
 				function dragstarted(d) {
 					if (!d3.event.active) simulation.alphaTarget(.03).restart();
@@ -293,7 +358,7 @@
 				var legendSpacing = 4
 				
 				var legend = svg.selectAll('.legend')
-				  .data(d3.map(dat, function(d){return d.section;}).keys().sort())
+				  .data(d3.map(dat, function(d){return d.section;}).keys().slice(0,3).sort())
 				  .enter()
 				  .append('g')
 				  .attr('class', 'legend')

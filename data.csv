@@ -1,11 +1,15 @@
-name,project,section,type,coolness,blurb,path
-EDGAR Asset Backed Security Data Pipeline,edgar_pipeline,cloud,path,5,,abs-ee/absee.html
-NRGI: IMF Forecast Tracker,imf_forecast_tracker,shiny,link,5,Web app combining annual IMF forecast datasets into a single interactive tool.,http://apps.resourcegovernance.org/forecast-tracker/
-NRGI: PDF Table Extractor,pdf_table_extractor,shiny,link,4,Public-utility tool to extract data tables from PDF documents in your browser.,http://apps.resourcegovernance.org/pdf-table-extractor/
-Iron Dome: A d3.js game,iron_dome,geospatial,path,4,Save the world in this geography game created entirely with d3.,projects/d3/Maps/IronDomeGame.html
-d3 and Leaflet Combo,d3_and_leaflet,geospatial,path,2,A visualization made with d3.,projects/Leaflet/map.html
-PWYPUS: Gulf of Mexico Lease and Production Explorer,lease_explorer,geospatial,link,3,Completed for Publish What You Pay - United States to connect and visualize Gulf of Mexico oil and gas data from the US government.,https://pwypusa.github.io/pages/gulf_explorer.html
-EIA Data: Energy Deregulation,energy_dereg,analysis,path,2,,projects/energy_projects/dereg2.html
-CFPB Data: Wells Fargo complaints,Cfpb_3,analysis,path,2,,projects/CFPB/CFPB3.html
-Interactive Emissions Graph,wri_emitters,visualization,path,3,"d3 visualization of global emissions, modeled on a static chart from the World Resources Institute.",projects/d3/WRI_graph.html
-CFPB Data: Payday loan complaints,Cfpb_1,analysis,path,3,,projects/CFPB/CFPB1.html
+id,name,project,section,shape,type,coolness,blurb,path
+1,EDGAR Asset Backed Security Data Pipeline,edgar_pipeline,app,circle,path,5,,abs-ee/absee.html
+2,NRGI: IMF Forecast Tracker,imf_forecast_tracker,app,circle,link,5,Web app combining annual IMF forecast datasets into a single interactive tool.,http://apps.resourcegovernance.org/forecast-tracker/
+3,NRGI: PDF Table Extractor,pdf_table_extractor,app,circle,link,4,Public-utility tool to extract data tables from PDF documents in your browser.,http://apps.resourcegovernance.org/pdf-table-extractor/
+4,Iron Dome: A d3.js game,iron_dome,app,circle,path,4,Save the world in this geography game created entirely with d3.,projects/d3/Maps/IronDomeGame.html
+5,d3 and Leaflet Combo,d3_and_leaflet,visualization,circle,path,2,A visualization made with d3.,projects/Leaflet/map.html
+6,PWYPUS: Gulf of Mexico Lease and Production Explorer,lease_explorer,app,circle,link,3,Completed for Publish What You Pay - United States to connect and visualize Gulf of Mexico oil and gas data from the US government.,https://pwypusa.github.io/pages/gulf_explorer.html
+7,EIA Data: Energy Deregulation,energy_dereg,analysis,circle,path,2,,projects/energy_projects/dereg2.html
+8,CFPB Data: Wells Fargo complaints,Cfpb_3,analysis,circle,path,2,,projects/CFPB/CFPB3.html
+9,Interactive Emissions Graph,wri_emitters,visualization,circle,path,3,"d3 visualization of global emissions, modeled on a static chart from the World Resources Institute.",projects/d3/WRI_graph.html
+10,CFPB Data: Payday loan complaints,Cfpb_1,analysis,circle,path,3,,projects/CFPB/CFPB1.html
+11,R,,,rect,,,,
+12,d3.js,,,rect,,,,
+13,R-Shiny,,,rect,,,,
+14,AWS,,,rect,,,,
