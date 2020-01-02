@@ -6,12 +6,12 @@
 		 
 		<script src="https://d3js.org/d3.v4.min.js"></script>
 		<link rel="shortcut icon" type="image/x-icon" href="favicon[1].ico">
-		<link rel="stylesheet" type="text/css" href="/css/main.css">
+		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<style>
 			#sidebar {
 				position: absolute;
 				right: 0;
-				width: 50%;
+				width: 0%;
 				height: 100%;
 				z-index: 100;
 				<!-- pointer-events: none -->
@@ -19,178 +19,419 @@
 		</style>
 	</head>
 	<body>
-		<div id="sidebar"></div>
+		<!-- <div id="sidebar"></div> -->
 		<nav>
     		<ul>
         		<li><a href="/">Home</a></li>
 	        	<li><a href="pages/about.html">About</a></li>
+				<li><a href="pages/resume.pdf">Resume</a></li>
         		
     		</ul>
 		</nav>
+		<div> 
+			Welcome to Tommy's portfolio. <br> <br>
+			The network graph below represents various projects I've done linked by the technology used in them. <br><br>
+			This includes a mix of personal and professional projects. <br> <br>
+			Hover over the circles for info and click on them to view the projects.
+		</div>
 		
-		<div id='main' class="container">
-    		<div class="blurb">
-        		<h2>Tommy Morrison</h2>
-				<h4>Cloud-based Projects</h4>
-				<ul>
-					<li><a href="/abs-ee/absee.html">  EDGAR Asset Backed Security Data Pipeline </a></li>
-					
-				</ul>
-				
-				<h4>Interactive Web Applications (built w/ R Shiny)</h4>
-				<ul>
-					<li><a href="http://apps.resourcegovernance.org/forecast-tracker/" target="_blank">IMF Forecast Tracker</a></li>
-					<li><a href="http://apps.resourcegovernance.org/pdf-table-extractor/" target="_blank">PDF Table Extractor</a></li>
-				</ul>
-				
-				<h4>Geospatial</h4>
-				<ul>
-					<li><a href="/projects/d3/Maps/IronDomeGame.html">  Iron Dome: A D3.js geography game </a></li>
-					<li><a href="/projects/Leaflet/map.html">  D3 and Leaflet Map and Chart combo </a></li>
-					<li><a href="https://pwypusa.github.io/pages/gulf_explorer.html" target="_blank"> Gulf of Mexico Lease and Production Explorer (w/ Carto.js/Leaflet.js/R)</a></li>
-					<!-- <li><a href="/projects/pwyp_interactive.html"> Oil & Gas/Mining Company Disclosure Map (w/ Leaflet for R)</a></li> -->
-				</ul>
-				
-				<h4>Analysis (R)</h4>
-				<ul>	
-					<li><a href="/projects/abs/jan2019.html"> Delinquency in Recent Auto-loan Data</a></li>
-					<li><a href="/projects/abs/absee1.html"> Auto Asset-Backed Securities Data Intro</a></li>
-				    <li><a href="/projects/CFPB/CFPB3.html"> Wells Fargo and the $185 Million Complaints</a></li>					
-					<!-- <li><a href="/projects/Chicago_crime.html"> Chicago Crime Data</a></li> -->
-					<!-- <li><a href="/projects/CFPB/cfpbmap.html"> Mapping CFPB Complaint Data</a></li> -->
-					<li><a href="/projects/CFPB/CFBP2.html"> Exploring CFPB Mortgage Complaints</a></li>
-					<li><a href="/projects/CFPB/CFPB1.html"> Exploring CFPB Payday Loan Complaints</a></li> 
-					<li><a href="/projects/energy_projects/dereg2.html"> Energy Market Deregulation in the US, pt. 2</a></li>
-					<li><a href="/projects/energy_projects/fourth_project.html"> Energy Market Deregulation in the US</a></li>
-					<li><a href="/projects/energy_projects/third_project.html"> US Energy Prices</a></li>
-					<li><a href="/projects/energy_projects/second_project.html"> US Energy Production, pt. 2</a></li>
-					<li><a href="/projects/energy_projects/first_project.html"> US Energy Production</a></li>
-				</ul>
-				
-				<h4>D3.js</h4>
-				<ul>
-					<li><a href="/projects/d3/WRI_graph.html">Top Ten Emitters: Interactive graph based on World Resources Institute visualization</a></li>
-					<!-- <li><a href="/projects/Project sample/Master.html">Multi-level bar graph with stacked groups, payments to governments data</a></li> -->
-					<li><a href="/projects/d3/nat_gas.html">Auto-scaling, adjustable bar graph with date axis, EIA data</a></li>
-					<li><a href="/projects/d3/test.html">D3.js SVG manipulation sample</a></li>
-				</ul>	
-				
-				
-				
-				
-				
-				
-    		</div><!-- /.blurb -->
-		</div><!-- /.container -->
+		<div id='list'></div>
+		
+		<div id='plot'></div>
+		<button type="button" onclick="toggle(state)">Toggle view</button>
+		
+		<div><p> </p></div>
+		<text style="font-weight:normal"><i>visualization created with d3.js</i></text>
 		<footer>
     		<ul>
         		<li><a href="mailto:thomas.r.morrison@gmail.com">email</a></li>
-        		<li><a href="https://github.com/moman822">github.com/moman822</a></li>
+        		<li><a href="https://github.com/moman822">github.com/moman822</a></li>				
 			</ul>
 		</footer>
-		<script>
-			var bulletPointColor = function() {d3.selectAll('li')
-									.style('color','white')
-									//.style('opacity','0')
-									.transition()
-									//.delay(5000)
-									.delay(function(d,i){return 800+(i * 100)})
-									.duration(2000)
-									.style('color','black')
-									//.style('opacity','1')
-										//.on('end', function() {
-										//	d3.selectAll('li')
-										//		.transition()
-										//		.delay(function(d,i){return i * 100})
-										//		.duration(2000)
-										//		.style('color','black')
-													//.on('end', bulletPointColor)
-										//	});
-									}
-			bulletPointColor()
-			
-			var count = 1
-			
-			d3.select('#sidebar')
-				.append('svg')
-				.attr('height','100%')
-				.attr('width','100%')
-			d3.select('svg')
-				.append('circle')
-				.attr('cx', '90%').attr('cy','5%').attr('r','1%').attr('fill','black').attr('opacity', .5)
-				.on('mouseover', function(){
-					d3.select(this)
-						//.attr('outline', 1)
-						.attr('stroke', 'black')
-						.attr('stroke-width', 5)
-				})
-				.on('mouseout', function(){
-					d3.select(this)
-						.attr('stroke', 'white')
-						.attr('stroke-width', 0)
-						//.attr('fill', 'red')
-				})
-				.on('click', function() {
-						if(count==1) {
-							console.log("count 1")
-							bounce(false)
-							count = 2
-							slide(true)
-							
-							
-							
-						} else {
-							console.log("count 2")
-							count = 1
-							slide(false)
-							bounce(true)
-						}											
-				})
-			var bounce = function (repeat) {
-			
-							if(repeat==true){
-								d3.select('circle')
-											.transition()										
-											.duration(5000)
-											.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
-											.attr('cy','93%')
-											.attr('r', Math.random() * 3 + '%')										
-											.on('end', function() {
-												d3.select(this)
-													.transition()
-													.duration(5000)
-													.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
-													.attr('cy','4.1%')
-													.attr('r', Math.random() * 3 + '%')
-													.on('end', function(){bounce(true)});
-											})
-							} else {
-								console.log("stop")
-							}
-						}
-			var slide = function (repeat) {
-							if(repeat==true){
-								d3.select('circle')
-											.transition()										
-											.duration(5000)
-											.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
-											.attr('cx','96%')
-											.attr('r', Math.random() * 3 + '%')										
-											.on('end', function() {
-												d3.select(this)
-													.transition()
-													.duration(5000)
-													.attr('fill', 'hsl(' + (Math.random()*360) + ',	100%, 50%)')
-													.attr('cx','3.%')
-													.attr('r', Math.random() * 3 + '%')
-													.on('end', function(){slide(true)});
-											})
-							} else {
-								console.log("stop")
-							}			
-			}
 		
-			bounce(true)
+		
+		
+		<script>
+			
+			function openInNewTab(url) {
+			  var win = window.open(url, '_blank');
+			  win.focus();
+			}
+			
+			function split(left, right, parts) {
+				var result = [],
+					delta = (right - left) / (parts - 1);
+				while (left < right) {
+					result.push(left);
+					left += delta;
+				}
+				result.push(right);
+				return result;
+			}
+
+			
+			var dat
+			var links
+			var groupScale		
+						
+			var width = document.documentElement.clientWidth * (3/5)
+			var height = 560
+			
+			var svg = d3.select("#plot")
+			  .append("svg")
+				.attr("width", width)
+				.attr("height", height)
+			
+			var state = 'circle'
+			var toggle
+			var test
+			
+			
+			d3.csv('links.csv', function(data) {
+				links = data
+			})
+			
+			d3.csv('data.csv', function(data) {
+				console.log(data)
+				dat = data
+							
+		//=================================================================================================
+		//=================================================================================================
+				toggle = function(st) {
+				
+					if(st=='circle'){
+						console.log('circle to list')
+						
+						d3.selectAll('.circle.node>circle')
+							.transition()
+								.delay(250)
+								.duration(500)
+								.attr('r', 0)
+								//.style('opacity', 0)
+								
+						d3.selectAll('.rect.node')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.style('opacity', 0)
+						
+						
+						
+						d3.selectAll('line')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.style('opacity', 0)
+						
+						
+						var list_g = svg.append('g')
+							.selectAll('circle')
+							.data(
+								dat.sort(function(x, y){
+									return d3.ascending(x.section, y.section);
+								}).filter(function(d){
+									return d.section != ""
+								})
+							)
+							.enter()
+						
+						list_g.append('circle')
+								.attr('class', 'list')
+								.attr('cx', 10)
+								.attr('cy', function(d, i){ return 120 + (i * 25) })
+								.attr('r', 0)
+								.style("fill", function(d){ return colorScale(d.section)})
+								.style("fill-opacity", 0.8)
+								.attr("stroke", "black")
+								.style("stroke-width", 1)
+								.transition()
+								.delay(250)
+								.duration(500)
+									.attr('r', 5)
+						
+						list_g.append('text')
+								.attr('class', 'list')								
+								.attr('x', 22)
+								.attr('y', function(d, i){ return 126 + (i*25)})
+								.style('opacity', 0)
+								.html(function(d){ return '<a href="'+d.path+'" target="_blank">' +d.name+'</a>' })
+								.transition()
+								.delay(250)
+								.duration(500)
+									.style('opacity', 1)
+							
+						state = 'list'
+					} else {
+						console.log('list to circle')
+						
+						d3.selectAll('.circle.node>circle')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.style('opacity', 1)
+							.attr("r", function(d){ return size(d.coolness)})
+						
+						d3.selectAll('.rect.node')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.style('opacity', 1)
+						
+						d3.selectAll('line')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.style('opacity', 1)
+							
+						d3.selectAll('.list')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.attr("r", 0)
+							.style('opacity', 0)
+							.remove()
+						
+						state = 'circle'
+					}
+					
+				}
+		//=================================================================================================
+		//=================================================================================================
+				var Tooltip = d3.select("#plot")
+					.append("div")
+					.style("opacity", 0)
+					.attr("class", "tooltip")
+					.style('max-width', "325px")
+					.style("display","inline-block")
+					.style('position', 'absolute')
+					.style("background-color", "white")
+					.style("border", "solid")
+					.style("border-width", "2px")
+					.style("border-radius", "5px")
+					.style("padding", "5px")
+					.style('font-weight', 'normal')
+		//=================================================================================================
+		//=================================================================================================
+		
+		//=================================================================================================
+		//=================================================================================================
+				groupScale = d3.scaleOrdinal()
+					.domain(d3.map(dat, function(d){return d.section;}).keys().sort())
+					.range(split(0, width/3, (d3.map(dat, function(d){return d.section;}).keys().length)))
+					
+				var colorScale = d3.scaleOrdinal()
+					.domain(d3.map(dat, function(d){return d.section;}).keys())
+					//.range(["55dde0","33658a","2f4858","f6ae2d","f26419"])
+					.range(
+						[
+							"a5ff72",
+							//"ed5021",
+							"1adbd8",
+							"ff14a5",
+							"fff009",
+							"32b0ff"
+						]
+					)
+				
+				size = d3.scaleLinear()
+					.domain([0, 6])
+					.range([7,40])
+					//.range([25,25])
+		//=================================================================================================
+		//=================================================================================================	  
+		
+				
+		//=================================================================================================
+		//=================================================================================================
+				
+				var link = svg.append('g')
+					.selectAll("line")
+					.data(links)
+					.enter()
+					.append("line")
+					  .style("stroke", "black")
+				
+				
+				node = svg.append("g")
+					.selectAll("circle")
+					.data(dat)
+					.enter()
+					.append("g")
+					//  .attr("class", "node")
+					.attr("class", function(d) {
+						return d.shape + " node";
+					})
+					.call(d3.drag()
+					   .on("start", dragstarted)
+					   .on("drag", dragged)
+					   .on("end", dragended)) 
+				
+				
+				var rh = 70
+				var rw = 70
+				
+				d3.selectAll('.rect').append('rect')
+					.attr('width', rw)
+					.attr('height', rh)
+					.attr('fill', 'white')
+					.attr('stroke', 'black')
+					.attr('x', -rw/2)
+					.attr('y', -rh/2)
+					.attr('rx', 5)
+					.attr('ry', 5)
+				
+				d3.selectAll('.rect').append('text')
+					.attr('x', 0)
+					.attr("y", 4)
+					.style("text-anchor", "middle")
+					.html(function(d){ return ''+d.name+'' })
+					//.html(function(d){ return '<a href="'+d.path+'" target="_blank">' +d.name+'</a>' })
+				
+				d3.selectAll('.circle').append('circle')
+					  .attr("r", function(d){ return size(d.coolness)})
+					  //.attr("cx", width / 2)
+					  //.attr("cy", height / 2)
+					  .style("fill", function(d){ return colorScale(d.section)})
+					  .style("fill-opacity", 1)
+					  .attr("stroke", "black")
+					  .style("stroke-width", 1)
+					  .on("mouseover", function(d){
+							Tooltip
+								.style("opacity", 1)
+								.style('z-index', 1)
+							
+							d3.select(this)
+								.style('stroke-width', 3)
+					  })
+					  .on("mousemove", function(d){
+							
+							Tooltip
+							  .html('<b>' + d.name + '</b><br><i>click to open</i><br>'+d.blurb)
+							  .style("left",(d3.event.pageX+20+"px"))//d3.mouse(this)[0]+400) + "px")
+							  .style("top", (d3.event.pageY+"px"))//d3.mouse(this)[1]+height) + "px")	
+							
+					  })
+					  .on("mouseleave", function(d){
+							Tooltip
+								.style("opacity", 0)
+								.style('z-index', -1)
+						
+							d3.select(this)
+								.style('stroke-width', 1)
+						
+					  })
+					  .on('click', function(d){
+						openInNewTab(d.path)
+						
+						d3.select(this)
+							.style('opacity', .5)
+						
+					  })
+					
+				
+				
+				
+				
+			  // Features of the forces applied to the nodes:
+				simulation = d3.forceSimulation()
+					.force("link", d3.forceLink().id(function(d) { return d.id; }))
+					//.force("x", d3.forceX().strength(0.9).x( function(d){ return groupScale(d.section) } ))
+					//.force("y", d3.forceY().strength(0.4).y( height/2 ))
+					.force("center", d3.forceCenter().x(width / 2.9).y(height / 2)) // Attraction to the center of the svg area
+					.force("charge", d3.forceManyBody()
+						.strength(-400)
+						.theta(0.1)
+						.distanceMax(350)
+					)//.strength(.1)) // Nodes are attracted one each other of value is > 0
+					.velocityDecay(0.9)
+					.force("collide", d3.forceCollide().strength(1).radius(60).iterations(1)) // Force that avoids circle overlapping
+					//.force("center", d3.forceCenter(width / 2, height / 2));
+					
+				
+				
+			  ////Apply these forces to the nodes and update their positions.
+			  // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
+				simulation
+					.nodes(dat)
+					.on("tick", function(d){
+						var radius = 40
+						node.attr("transform", function (d) {							
+							var xpos = Math.max(radius, Math.min(width - radius, d.x))							
+							var ypos = Math.max(radius, Math.min(height - radius, d.y))
+							return "translate(" + xpos + "," + ypos + ")";
+						})
+						
+						link
+							.attr("x1", function(d) { return Math.max(radius, Math.min(width - radius, d.source.x))})//d.source.x; })
+							.attr("y1", function(d) { return Math.max(radius, Math.min(height - radius, d.source.y))})//d.source.y; })
+							.attr("x2", function(d) { return Math.max(radius, Math.min(width - radius, d.target.x))})//d.target.x; })
+							.attr("y2", function(d) { return Math.max(radius, Math.min(height - radius, d.target.y))})//d.target.y; });
+						//node
+						//	.attr("cx", function(d){ return d.x; })
+						//	.attr("cy", function(d){ return d.y; })
+							
+						//node.attr("transform", function (d) {
+						//	return "translate(" + d.x + "," + d.y + ")";
+						//});					
+						
+					})
+				
+				simulation.force("link")
+					.links(links)
+					
+				
+			  // What happens when a circle is dragged?
+				function dragstarted(d) {
+					if (!d3.event.active) simulation.alphaTarget(.03).restart();
+					d.fx = d.x;
+					d.fy = d.y;
+				}
+				function dragged(d) {
+					d.fx = d3.event.x;
+					d.fy = d3.event.y;
+				}
+				function dragended(d) {
+					if (!d3.event.active) simulation.alphaTarget(.03);
+					d.fx = null;
+					d.fy = null;
+				}
+		//=================================================================================================
+		//=================================================================================================
+		
+		//=================================================================================================
+		//=================================================================================================
+				var legendRectSize = 18
+				var legendSpacing = 5
+				
+				var legend = svg.selectAll('.legend')
+				  .data(d3.map(dat, function(d){return d.section;}).keys().slice(0,3).sort())
+				  .enter()
+				  .append('g')
+				  .attr('class', 'legend')
+				  .attr('transform', function(d, i) {
+					var height2 = legendRectSize + legendSpacing
+					var offset =  -200//-height
+					var horz =  width - 120
+					var vert = (i * height2) - offset - (6*height2)
+					return 'translate(' + horz + ',' + vert + ')'
+				  })
+                
+				legend.append('rect')
+				  .attr('width', 20)
+				  .attr('height', 20)
+				  .style('stroke', 'black')
+				  .style('fill', function(d){return colorScale(d)})
+				  
+				  
+				legend.append('text')
+				  .attr('x', -5)
+				  .attr('y', legendRectSize - legendSpacing)
+				  .style("text-anchor", "end")
+				  .text(function(d) { return d })
+		//=================================================================================================
+		//=================================================================================================
+			})	
+			
 		</script>
 	</body>
 </html>
