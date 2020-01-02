@@ -6,12 +6,12 @@
 		 
 		<script src="https://d3js.org/d3.v4.min.js"></script>
 		<link rel="shortcut icon" type="image/x-icon" href="favicon[1].ico">
-		<!-- <link rel="stylesheet" type="text/css" href="css/main.css"> -->
+		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<style>
 			#sidebar {
 				position: absolute;
 				right: 0;
-				width: 50%;
+				width: 0%;
 				height: 100%;
 				z-index: 100;
 				<!-- pointer-events: none -->
@@ -19,80 +19,188 @@
 		</style>
 	</head>
 	<body>
-		<div> Some stuff up here </div>
+		<!-- <div id="sidebar"></div> -->
+		<nav>
+    		<ul>
+        		<li><a href="/">Home</a></li>
+	        	<li><a href="pages/about.html">About</a></li>
+				<li><a href="pages/resume.pdf">Resume</a></li>
+        		
+    		</ul>
+		</nav>
+		<div> Welcome! <br> hover over the circles to see the projects <br>and click to view the projects </div>
 		
 		<div id='list'></div>
-		<div id='plot'></div>
 		
-		<div> Some more stuff down here </div>
+		<div id='plot'></div>
+		<button type="button" onclick="toggle(state)">Toggle view</button>
+		<button type="button" onclick="test()">TEST</button>
+		
+		<div><p> </p></div>
+		<footer>
+    		<ul>
+        		<li><a href="mailto:thomas.r.morrison@gmail.com">email</a></li>
+        		<li><a href="https://github.com/moman822">github.com/moman822</a></li>
+			</ul>
+		</footer>
+		
+		
 		
 		<script>
-		
-			var dat
 			
-			var width = 460
-			var height = 460
+			function openInNewTab(url) {
+			  var win = window.open(url, '_blank');
+			  win.focus();
+			}
+			
+			function split(left, right, parts) {
+				var result = [],
+					delta = (right - left) / (parts - 1);
+				while (left < right) {
+					result.push(left);
+					left += delta;
+				}
+				result.push(right);
+				return result;
+			}
 
-			// append the svg object to the body of the page
+			
+			var dat
+			var groupScale		
+						
+			var width = document.documentElement.clientWidth * (2/3)
+			var height = 560
+			
 			var svg = d3.select("#plot")
 			  .append("svg")
 				.attr("width", width)
 				.attr("height", height)
 			
+			var state = 'circle'
+			var toggle
+			var test
+			
+			
+			
 			d3.csv('data.csv', function(data) {
 				console.log(data)
 				dat = data
+							
+		//=================================================================================================
+		//=================================================================================================
+				toggle = function(st) {
 				
-				
-				d3.select('#list').append('ul')
-					.selectAll('li')
-					.data(dat)
-					.enter()
-					.append('li')
-					.html(function(d){return '<b>'+d.name+'</b>'})
-				
-				
-				var colorScale = d3.scaleOrdinal()
-					.domain(d3.map(dat, function(d){return d.section;}).keys())
-					.range(["gold", "blue", "green", "yellow", "black", "grey", "darkgreen", "pink", "brown", "slateblue", "grey1", "orange"])
-					//.range(d3.schemeSet1);
-				
-				var size = d3.scaleLinear()
-					.domain([0, 6])
-					.range([7,55])  // circle will be between 7 and 55 px wide
-				
-			  // create a tooltip
+					if(st=='circle'){
+						console.log('circle to list')
+						
+						d3.selectAll('.node')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.attr('r', 0)
+						
+						
+						var list_g = svg.append('g')
+							.selectAll('circle')
+							.data(dat.sort(function(x, y){
+								return d3.ascending(x.section, y.section);
+							}))
+							.enter()
+						
+						list_g.append('circle')
+								.attr('class', 'list')
+								.attr('cx', 10)
+								.attr('cy', function(d, i){ return 120 + (i * 25) })
+								.attr('r', 0)
+								.style("fill", function(d){ return colorScale(d.section)})
+								.style("fill-opacity", 0.8)
+								.attr("stroke", "black")
+								.style("stroke-width", 1)
+								.transition()
+								.delay(250)
+								.duration(500)
+									.attr('r', 5)
+						
+						list_g.append('text')
+								.attr('class', 'list')								
+								.attr('x', 22)
+								.attr('y', function(d, i){ return 126 + (i*25)})
+								.style('opacity', 0)
+								.html(function(d){ return '<a href="'+d.path+'" target="_blank">' +d.name+'</a>' })
+								.transition()
+								.delay(250)
+								.duration(500)
+									.style('opacity', 1)
+							
+						state = 'list'
+					} else {
+						console.log('list to circle')
+						
+						d3.selectAll('.node')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.attr("r", function(d){ return size(d.coolness)})
+							
+						d3.selectAll('.list')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.attr("r", 0)
+							.style('opacity', 0)
+							.remove()
+						
+						
+						state = 'circle'
+					}
+					
+				}
+		//=================================================================================================
+		//=================================================================================================
 				var Tooltip = d3.select("#plot")
 					.append("div")
 					.style("opacity", 0)
 					.attr("class", "tooltip")
+					.style('max-width', "325px")
+					.style("display","inline-block")
 					.style('position', 'absolute')
 					.style("background-color", "white")
 					.style("border", "solid")
 					.style("border-width", "2px")
 					.style("border-radius", "5px")
 					.style("padding", "5px")
-
-			  // Three function that change the tooltip when user hover / move / leave a cell
-				var mouseover = function(d) {
-					Tooltip
-					.style("opacity", 1)
+		//=================================================================================================
+		//=================================================================================================
+		
+		//=================================================================================================
+		//=================================================================================================
+				groupScale = d3.scaleOrdinal()
+					.domain(d3.map(dat, function(d){return d.section;}).keys().sort())
+					.range(split(0, width/3, (d3.map(dat, function(d){return d.section;}).keys().length)))
+					
+				var colorScale = d3.scaleOrdinal()
+					.domain(d3.map(dat, function(d){return d.section;}).keys())
+					//.range(["55dde0","33658a","2f4858","f6ae2d","f26419"])
+					.range(["fff009","32b0ff","ed5021","1adbd8","ff14a5"])
+				
+				size = d3.scaleLinear()
+					.domain([0, 6])
+					.range([7,60])
+		
+		//=================================================================================================
+		//=================================================================================================	  
+		
+				test = function() {
+					console.log('test')
+					
+					node
+					
+					
 				}
-				var mousemove = function(d) {
-					Tooltip
-					  .html('<u>' + d.name + '</u>')
-					  .style("left",(d3.mouse(this)[0]) + "px")
-					  .style("top", (d3.mouse(this)[1]+130) + "px")
-					  //.style("left", (d3.event.pageX) + "px")		
-					  //.style("top", (d3.event.pageY - 28) + "px")
-				}
-				var mouseleave = function(d) {
-					Tooltip
-					.style("opacity", 0)
-				}
-
-				// Initialize the circle: all located at the center of the svg area
-				var node = svg.append("g")
+				
+		//=================================================================================================
+		//=================================================================================================
+				node = svg.append("g")
 					.selectAll("circle")
 					.data(dat)
 					.enter()
@@ -105,29 +213,61 @@
 					  .style("fill-opacity", 0.8)
 					  .attr("stroke", "black")
 					  .style("stroke-width", 1)
-					  .on("mouseover", mouseover) // What to do when hovered
-					  .on("mousemove", mousemove)
-					  .on("mouseleave", mouseleave)
-					  .call(d3.drag() // call specific function when circle is dragged
-						   .on("start", dragstarted)
-						   .on("drag", dragged)
-						   .on("end", dragended));
-
+					  .on("mouseover", function(d){
+							Tooltip
+								.style("opacity", 1)
+								.style('z-index', 1)
+							
+							d3.select(this)
+								.style('stroke-width', 3)
+					  })
+					  .on("mousemove", function(d){
+							Tooltip
+							  .html('<b>' + d.name + '</b><br><i>click to open</i><br>'+d.blurb)
+							  .style("left",(d3.mouse(this)[0]+20) + "px")
+							  .style("top", (d3.mouse(this)[1]+100) + "px")	
+						
+					  })
+					  .on("mouseleave", function(d){
+							Tooltip
+								.style("opacity", 0)
+								.style('z-index', -1)
+						
+							d3.select(this)
+								.style('stroke-width', 1)
+						
+					  })
+					  .on('click', function(d){
+						openInNewTab(d.path)
+						
+						d3.select(this)
+							.style('opacity', .5)
+						
+					  })
+					.call(d3.drag()
+					   .on("start", dragstarted)
+					   .on("drag", dragged)
+					   .on("end", dragended))
+					
 			  // Features of the forces applied to the nodes:
-				var simulation = d3.forceSimulation()
-				  .force("center", d3.forceCenter().x(width / 2).y(height / 2)) // Attraction to the center of the svg area
-				  .force("charge", d3.forceManyBody().strength(.1)) // Nodes are attracted one each other of value is > 0
-				  .force("collide", d3.forceCollide().strength(.2).radius(60).iterations(1)) // Force that avoids circle overlapping
-
-			  // Apply these forces to the nodes and update their positions.
+				simulation = d3.forceSimulation()
+					.force("x", d3.forceX().strength(0.9).x( function(d){ return groupScale(d.section) } ))
+					//.force("y", d3.forceY().strength(0.4).y( height/2 ))
+					.force("center", d3.forceCenter().x(width / 2).y(height / 2)) // Attraction to the center of the svg area
+					.force("charge", d3.forceManyBody().strength(.1)) // Nodes are attracted one each other of value is > 0
+					.force("collide", d3.forceCollide().strength(.2).radius(60).iterations(1)) // Force that avoids circle overlapping
+				  
+				
+			  ////Apply these forces to the nodes and update their positions.
 			  // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
 				simulation
-				  .nodes(dat)
-				  .on("tick", function(d){
-					node
-						.attr("cx", function(d){ return d.x; })
-						.attr("cy", function(d){ return d.y; })
-				  });
+					.nodes(dat)
+					.on("tick", function(d){
+						node
+							.attr("cx", function(d){ return d.x; })
+							.attr("cy", function(d){ return d.y; })
+							
+					})
 
 			  // What happens when a circle is dragged?
 				function dragstarted(d) {
@@ -144,8 +284,42 @@
 					d.fx = null;
 					d.fy = null;
 				}
+		//=================================================================================================
+		//=================================================================================================
+		
+		//=================================================================================================
+		//=================================================================================================
+				var legendRectSize = 18
+				var legendSpacing = 4
+				
+				var legend = svg.selectAll('.legend')
+				  .data(d3.map(dat, function(d){return d.section;}).keys().sort())
+				  .enter()
+				  .append('g')
+				  .attr('class', 'legend')
+				  .attr('transform', function(d, i) {
+					var height2 = legendRectSize + legendSpacing
+					var offset =  -200//-height
+					var horz =  width - 120
+					var vert = (i * height2) - offset - (6*height2)
+					return 'translate(' + horz + ',' + vert + ')'
+				  })
+                
+				legend.append('rect')
+				  .attr('width', 20)
+				  .attr('height', 20)
+				  .style('fill', function(d){return colorScale(d)})
+				  
+				  
+				legend.append('text')
+				  .attr('x', -5)
+				  .attr('y', legendRectSize - legendSpacing)
+				  .style("text-anchor", "end")
+				  .text(function(d) { return d })
+		//=================================================================================================
+		//=================================================================================================
+			})	
 			
-			})			
 		</script>
 	</body>
 </html>
