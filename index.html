@@ -29,9 +29,10 @@
     		</ul>
 		</nav>
 		<div> 
-			Welcome to Tommy's portfolio. <br> 
-			The network graph below represents various projects linked by the technology used in them. <br>
-			Hover over the circles to view extra info and click on them to view the projects.
+			Welcome to Tommy's portfolio. <br> <br>
+			The network graph below represents various projects I've done linked by the technology used in them. <br><br>
+			This includes a mix of personal and professional projects. <br> <br>
+			Hover over the circles for info and click on them to view the projects.
 		</div>
 		
 		<div id='list'></div>
@@ -221,12 +222,21 @@
 				var colorScale = d3.scaleOrdinal()
 					.domain(d3.map(dat, function(d){return d.section;}).keys())
 					//.range(["55dde0","33658a","2f4858","f6ae2d","f26419"])
-					.range(["ed5021","1adbd8","ff14a5","fff009","32b0ff"])
+					.range(
+						[
+							"a5ff72",
+							//"ed5021",
+							"1adbd8",
+							"ff14a5",
+							"fff009",
+							"32b0ff"
+						]
+					)
 				
 				size = d3.scaleLinear()
 					.domain([0, 6])
 					.range([7,40])
-		
+					//.range([25,25])
 		//=================================================================================================
 		//=================================================================================================	  
 		
@@ -391,7 +401,7 @@
 		//=================================================================================================
 		//=================================================================================================
 				var legendRectSize = 18
-				var legendSpacing = 4
+				var legendSpacing = 5
 				
 				var legend = svg.selectAll('.legend')
 				  .data(d3.map(dat, function(d){return d.section;}).keys().slice(0,3).sort())
@@ -409,6 +419,7 @@
 				legend.append('rect')
 				  .attr('width', 20)
 				  .attr('height', 20)
+				  .style('stroke', 'black')
 				  .style('fill', function(d){return colorScale(d)})
 				  
 				  

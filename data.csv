@@ -13,3 +13,6 @@ id,name,project,section,shape,type,coolness,blurb,path
 12,d3.js,,,rect,,,,
 13,R-Shiny,,,rect,,,,
 14,AWS,,,rect,,,,
+15,NRGI: Azerbaijan Budget Data Analysis,az_budget,analysis,circle,link,3,Analysis and d3 visualization of budget data and oil revenues in Azerbaijan.,https://resourcegovernance.org/blog/azerbaijan-budget-expenditures-fluctuate-oil-revenues
+16,Auto ABS: Intro,,analysis,circle,path,2,,projects/abs/absee1.html
+17,Auto ABS: Delinquency in 1.7 million loans,,analysis,circle,path,1,,projects/abs/jan2019.html
