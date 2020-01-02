@@ -28,19 +28,23 @@
         		
     		</ul>
 		</nav>
-		<div> Welcome! <br> hover over the circles to see the projects <br>and click to view the projects </div>
+		<div> 
+			Welcome to Tommy's portfolio. <br> 
+			The network graph below represents various projects linked by the technology used in them. <br>
+			Hover over the circles to view extra info and click on them to view the projects.
+		</div>
 		
 		<div id='list'></div>
 		
 		<div id='plot'></div>
 		<button type="button" onclick="toggle(state)">Toggle view</button>
-		<button type="button" onclick="test()">TEST</button>
 		
 		<div><p> </p></div>
+		<text style="font-weight:normal"><i>visualization created with d3.js</i></text>
 		<footer>
     		<ul>
         		<li><a href="mailto:thomas.r.morrison@gmail.com">email</a></li>
-        		<li><a href="https://github.com/moman822">github.com/moman822</a></li>
+        		<li><a href="https://github.com/moman822">github.com/moman822</a></li>				
 			</ul>
 		</footer>
 		
@@ -69,7 +73,7 @@
 			var links
 			var groupScale		
 						
-			var width = document.documentElement.clientWidth * (2/3)
+			var width = document.documentElement.clientWidth * (3/5)
 			var height = 560
 			
 			var svg = d3.select("#plot")
@@ -97,18 +101,37 @@
 					if(st=='circle'){
 						console.log('circle to list')
 						
-						d3.selectAll('.node')
+						d3.selectAll('.circle.node>circle')
+							.transition()
+								.delay(250)
+								.duration(500)
+								.attr('r', 0)
+								//.style('opacity', 0)
+								
+						d3.selectAll('.rect.node')
 							.transition()
 							.delay(250)
 							.duration(500)
-							.attr('r', 0)
+							.style('opacity', 0)
+						
+						
+						
+						d3.selectAll('line')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.style('opacity', 0)
 						
 						
 						var list_g = svg.append('g')
 							.selectAll('circle')
-							.data(dat.sort(function(x, y){
-								return d3.ascending(x.section, y.section);
-							}))
+							.data(
+								dat.sort(function(x, y){
+									return d3.ascending(x.section, y.section);
+								}).filter(function(d){
+									return d.section != ""
+								})
+							)
 							.enter()
 						
 						list_g.append('circle')
@@ -140,11 +163,24 @@
 					} else {
 						console.log('list to circle')
 						
-						d3.selectAll('.node')
+						d3.selectAll('.circle.node>circle')
 							.transition()
 							.delay(250)
 							.duration(500)
+							.style('opacity', 1)
 							.attr("r", function(d){ return size(d.coolness)})
+						
+						d3.selectAll('.rect.node')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.style('opacity', 1)
+						
+						d3.selectAll('line')
+							.transition()
+							.delay(250)
+							.duration(500)
+							.style('opacity', 1)
 							
 						d3.selectAll('.list')
 							.transition()
@@ -153,7 +189,6 @@
 							.attr("r", 0)
 							.style('opacity', 0)
 							.remove()
-						
 						
 						state = 'circle'
 					}
@@ -173,6 +208,7 @@
 					.style("border-width", "2px")
 					.style("border-radius", "5px")
 					.style("padding", "5px")
+					.style('font-weight', 'normal')
 		//=================================================================================================
 		//=================================================================================================
 		
@@ -185,7 +221,7 @@
 				var colorScale = d3.scaleOrdinal()
 					.domain(d3.map(dat, function(d){return d.section;}).keys())
 					//.range(["55dde0","33658a","2f4858","f6ae2d","f26419"])
-					.range(["fff009","32b0ff","ed5021","1adbd8","ff14a5"])
+					.range(["ed5021","1adbd8","ff14a5","fff009","32b0ff"])
 				
 				size = d3.scaleLinear()
 					.domain([0, 6])
@@ -261,7 +297,7 @@
 							
 							Tooltip
 							  .html('<b>' + d.name + '</b><br><i>click to open</i><br>'+d.blurb)
-							  .style("left",(d3.event.pageX+10+"px"))//d3.mouse(this)[0]+400) + "px")
+							  .style("left",(d3.event.pageX+20+"px"))//d3.mouse(this)[0]+400) + "px")
 							  .style("top", (d3.event.pageY+"px"))//d3.mouse(this)[1]+height) + "px")	
 							
 					  })
@@ -291,7 +327,7 @@
 					.force("link", d3.forceLink().id(function(d) { return d.id; }))
 					//.force("x", d3.forceX().strength(0.9).x( function(d){ return groupScale(d.section) } ))
 					//.force("y", d3.forceY().strength(0.4).y( height/2 ))
-					.force("center", d3.forceCenter().x(width / 2).y(height / 2)) // Attraction to the center of the svg area
+					.force("center", d3.forceCenter().x(width / 2.9).y(height / 2)) // Attraction to the center of the svg area
 					.force("charge", d3.forceManyBody()
 						.strength(-400)
 						.theta(0.1)
@@ -317,9 +353,9 @@
 						
 						link
 							.attr("x1", function(d) { return Math.max(radius, Math.min(width - radius, d.source.x))})//d.source.x; })
-							.attr("y1", function(d) { return Math.max(radius, Math.min(width - radius, d.source.y))})//d.source.y; })
+							.attr("y1", function(d) { return Math.max(radius, Math.min(height - radius, d.source.y))})//d.source.y; })
 							.attr("x2", function(d) { return Math.max(radius, Math.min(width - radius, d.target.x))})//d.target.x; })
-							.attr("y2", function(d) { return Math.max(radius, Math.min(width - radius, d.target.y))})//d.target.y; });
+							.attr("y2", function(d) { return Math.max(radius, Math.min(height - radius, d.target.y))})//d.target.y; });
 						//node
 						//	.attr("cx", function(d){ return d.x; })
 						//	.attr("cy", function(d){ return d.y; })
