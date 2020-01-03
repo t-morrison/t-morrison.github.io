@@ -89,13 +89,13 @@
 			
 			
 			d3.csv('links.csv', function(data) {
-				links = data
+					links = data
 			})
 			
-			d3.csv('data.csv', function(data) {
+			d3.csv('data.csv', function(data, error) {
 				console.log(data)
 				dat = data
-							
+				
 		//=================================================================================================
 		//=================================================================================================
 				toggle = function(st) {
@@ -226,7 +226,7 @@
 					.range(
 						[
 							"#a5ff72",
-							//"ed5021",
+							//"#ed5021",
 							"#1adbd8",
 							"#ff14a5",
 							"#fff009",
