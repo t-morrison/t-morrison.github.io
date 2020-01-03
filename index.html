@@ -5,6 +5,8 @@
 		<meta charset="utf-8">
 		 
 		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="https://d3js.org/d3-queue.v3.min.js"></script>
+		
 		<link rel="shortcut icon" type="image/x-icon" href="favicon[1].ico">
 		<link rel="stylesheet" type="text/css" href="css/main.css">
 		<style>
@@ -88,14 +90,28 @@
 			var test
 			
 			
-			d3.csv('links.csv', function(data) {
-				links = data
-			})
+			//d3.csv('links.csv', function(data) {
+			//		links = data
+			//})
 			
-			d3.csv('data.csv', function(data) {
-				console.log(data)
-				dat = data
-							
+			//d3.csv('links.csv', function(data2) {
+			//	links = data2
+			//})
+			//
+			//d3.csv('data.csv', function(data) {
+				
+			d3.queue()
+				.defer(d3.csv, "data.csv")
+				.defer(d3.csv, "links.csv")
+				.await(function(error, data1, data2) {
+				  if (error) throw error;
+				  
+				  dat = data1
+				  links = data2
+				
+				//console.log(data)
+				//dat = data
+				
 		//=================================================================================================
 		//=================================================================================================
 				toggle = function(st) {
@@ -226,7 +242,7 @@
 					.range(
 						[
 							"#a5ff72",
-							//"ed5021",
+							//"#ed5021",
 							"#1adbd8",
 							"#ff14a5",
 							"#fff009",
