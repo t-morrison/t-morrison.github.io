@@ -73,7 +73,8 @@
 			var dat
 			var links
 			var groupScale		
-						
+			var colorScale
+			
 			var width = document.documentElement.clientWidth * (3/5)
 			var height = 560
 			
@@ -219,17 +220,17 @@
 					.domain(d3.map(dat, function(d){return d.section;}).keys().sort())
 					.range(split(0, width/3, (d3.map(dat, function(d){return d.section;}).keys().length)))
 					
-				var colorScale = d3.scaleOrdinal()
+				colorScale = d3.scaleOrdinal()
 					.domain(d3.map(dat, function(d){return d.section;}).keys())
 					//.range(["55dde0","33658a","2f4858","f6ae2d","f26419"])
 					.range(
 						[
-							"a5ff72",
+							"#a5ff72",
 							//"ed5021",
-							"1adbd8",
-							"ff14a5",
-							"fff009",
-							"32b0ff"
+							"#1adbd8",
+							"#ff14a5",
+							"#fff009",
+							"#32b0ff"
 						]
 					)
 				
