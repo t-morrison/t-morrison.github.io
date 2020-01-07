@@ -1,0 +1,204 @@
+---
+title: "Deregulated Electricity Markets in US States"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev='CairoPNG')
+
+setwd("C:/Users/TRM/Documents/GitHub/moman822.github.io")
+eia_key <- readLines("keys.txt")[1]
+# rmarkdown::render(input = "work/eia/state-energy-deregulation.Rmd", output_file = "work/eia/energy_dereg_1.html")
+```
+
+```{r echo=F, warning=F, error=F, message=F, results='hide'}
+library(ggplot2)
+library(data.table)
+library(ggthemes)
+library(maps)
+library(rmarkdown)
+library(httr)
+library(jsonlite)
+```
+
+```{r echo=F, warning=F, error=F, message=F, results='hide'}
+get_eia <- function(series, key){
+  query <- paste0("http://api.eia.gov/series/?api_key=", key, "&series_id=", series)
+  resp <- jsonlite::fromJSON(content(GET(query), as = 'text'))
+  data <- as.data.table(resp$series$data)
+  names(data) <- c("year","value")
+  data[, units := resp$series$units[1]]
+  data[, state := resp$series$iso3166[1]]
+  data[, variable := resp$series$name]
+  data
+}
+```
+
+```{r error=F, message=FALSE, warning=FALSE, include=FALSE, results='hide', cache=TRUE}
+
+average <- data.table(
+  jsonlite::fromJSON(content(GET(paste0("http://api.eia.gov/category/?api_key=", eia_key,"&category_id=40")), as='text'))$category$childseries
+)
+res <- data.table(
+  jsonlite::fromJSON(content(GET(paste0("http://api.eia.gov/category/?api_key=", eia_key,"&category_id=1012")), as='text'))$category$childseries
+)
+com <- data.table(
+  jsonlite::fromJSON(content(GET(paste0("http://api.eia.gov/category/?api_key=", eia_key,"&category_id=1013")), as='text'))$category$childseries
+)
+ind <- data.table(
+  jsonlite::fromJSON(content(GET(paste0("http://api.eia.gov/category/?api_key=", eia_key,"&category_id=1014")), as='text'))$category$childseries
+)
+
+average_series <- average[grepl("annual", name) & nchar(series_id)==19]$series_id
+res_series <- res[grepl("annual", name) & nchar(series_id)==19]$series_id
+com_series <- com[grepl("annual", name) & nchar(series_id)==19]$series_id
+ind_series <- ind[grepl("annual", name) & nchar(series_id)==19]$series_id
+
+all <- lapply(average_series, function(x){
+  get_eia(series = x, key = eia_key)
+})
+all <- rbindlist(all)
+
+
+res_dat <- lapply(res_series, function(x){
+  get_eia(series = x, key = eia_key)
+})
+res_dat <- rbindlist(res_dat)
+
+ind_dat <- lapply(ind_series, function(x){
+  get_eia(series = x, key = eia_key)
+})
+ind_dat <- rbindlist(ind_dat)
+
+com_dat <- lapply(com_series, function(x){
+  get_eia(series = x, key = eia_key)
+})
+com_dat <- rbindlist(com_dat)
+
+dat <- rbindlist(
+  list(all, res_dat, com_dat, ind_dat)
+)
+
+dat[nchar(state)==6, state:=substr(state, 5, 6)]
+
+dat[grepl("all sectors", variable), sector:="all"]
+dat[grepl("industrial", variable), sector:="industrial"]
+dat[grepl("residential", variable), sector:="residential"]
+dat[grepl("commercial", variable), sector:="commercial"]
+dat[, value:=as.numeric(value)]
+dat[, year:=as.numeric(year)]
+```
+
+```{r echo=F, warning=F, error=F, message=F, results='hide'}
+dat[state %in% c("IL","OH","WI","ND","SD","NE","KS","IA","MN","IN","MO","MI"), region:="mw"]
+dat[state %in% c("AZ","CO","ID","MT","NV","NM","UT","WY","AK","CA","HI","OR","WA"), region:="w"]
+dat[state %in% c("AL","KY","MS","TN","AR","LA","OK","TX","DE","FL","GA","MD","NC","SC","VA","WV", "DC"), region:="s"]
+dat[state %in% c("CT","ME","MA","NH","RI","VT","NJ","NY","PA"), region:="ne"]
+
+dereg <- c("OR",
+          "TX","MD","DC","DE",
+          "IL","MI","OH",
+          "NJ","NY","CT","RI","MA","NH","ME","PA")
+
+dat[, deregulated := ifelse(state %in% dereg, T, F)]
+```
+
+
+
+```{r echo=F, fig.align='center'}
+ggplot(dat[state=="IL"][year<=2002], aes(x=year, y=value, col=sector))+
+  geom_line(size=.6) +
+  geom_line(data=dat[state=="IL"], aes(x=year, y=value, col=sector, linetype=deregulated), size=.6) +
+  theme_solarized(light=T) +
+  ggtitle("Illinois Energy Prices, 1990-2014") + ylab("Price pr kWh (cents)")
+```
+
+It looks like prices stayed flat for the first four years of deregulation then jumped in 2006 before dropping back down. This is interesting but how do Illinois' prices compare to other states around them? Let's look at the states that border Illinois to compare how prices changed across this time period.
+
+Illinois borders Wisconsin, Iowa, Indiana, Missouri, and Kentucky. According to the EIA info, none of those states have had any electricity market restructuring, so it will be an interesting comparison.
+
+For the plot, I will look only at the `Total` sector.
+
+```{r include=FALSE}
+dat[state %in% c("IA","WI","IN","MO","KY") & sector=="all"]
+dat[state=="IL" & sector=="all"]
+```
+
+
+```{r echo=FALSE, fig.align='center'}
+ggplot(dat[state=="IL" & sector=="all"][year<=2002], aes(x=year, y=value, col=state)) +
+  geom_line() +
+  geom_line(data=dat[state=="IL" & sector=="all"], aes(x=year, y=value, linetype=deregulated)) +
+  geom_line(data=dat[state %in% c("IA","WI","IN","MO","KY") & sector=="all"], aes(x=year, y=value, col=state)) +
+  theme_solarized(light=F) +
+  ggtitle("Illinois & Neighbors' Energy Prices, 1990-2014") + ylab("Price pr kWh (cents)")
+
+```
+
+This looks quite good for energy deregulation in Illinois. Between 1990 and 2002, Illinois was the runaway leader in energy prices for these six states. But in 2014, Illinois prices were significantly lower than Wisconsin prices, within a fraction of a cent/kWh of Indiana and Missouri prices, and significantly closer to Iowa and Kentucky prices. Like we saw in the data for all the states from the last post, prices in regulated states rise steadily while in deregulated states, prices fluctuate quickly up and down.
+
+Deregulation is most common in the Northeast region of the US, where eight of nine states have deregulated their electricity markets since the 1990s. In such a geographically tight market, I would expect to see prices really come together in these states.
+
+```{r echo=F, fig.width=12, fig.height=7.5}
+dat[state=="RI", deregulated:= ifelse(year>=1998, T, F),]#set DR column T/F for each state
+dat[state=="PA", deregulated:= ifelse(year>=1999, T, F),] 
+dat[state=="NJ", deregulated:= ifelse(year>=1999, T, F),]
+dat[state=="CT", deregulated:= ifelse(year>=2000, T, F),]
+dat[state=="ME", deregulated:= ifelse(year>=2000, T, F),]
+dat[state=="MA", deregulated:= ifelse(year>=2000, T, F),]
+dat[state=="NH", deregulated:= ifelse(year>=2001, T, F),]
+dat[state=="NY", deregulated:= ifelse(year>=2002, T, F),]
+
+# VT<-priceYear[State=="VT" & Sector=="Total" & Industry=="Total Electric Industry"]
+# RI<-priceYear[State=="RI" & Sector=="Total" & Industry=="Total Electric Industry"]#new data.tables for plot
+# ne99<- priceYear[State%in%c("PA","NJ") & Sector=="Total" & Industry=="Total Electric Industry"]
+# ne00<-priceYear[State%in%c("CT","ME","MA") & Sector=="Total" & Industry=="Total Electric Industry"]
+# NH<-priceYear[State=="NH" & Sector=="Total" & Industry=="Total Electric Industry"]
+# NY<-priceYear[State=="NY" & Sector=="Total" & Industry=="Total Electric Industry"]
+# 
+# ggplot(RI[Year<=1998], aes(x=Year, y=Price, col=State)) +
+#   geom_line() +
+#   geom_line(data=VT, aes(x=Year, y=Price, col=State)) +
+#     geom_line(data=RI, aes(x=Year, y=Price, col=State, linetype=DR)) +
+#   geom_line(data=ne99[Year<=1999], aes(x=Year, y=Price, col=State)) +
+#     geom_line(data=ne99, aes(x=Year, y=Price, col=State, linetype=DR)) +
+#   geom_line(data=ne00[Year<=2000], aes(x=Year, y=Price, col=State)) +
+#     geom_line(data=ne00, aes(x=Year, y=Price, col=State, linetype=DR)) +
+#   geom_line(data=NH[Year<=2001], aes(x=Year, y=Price, col=State)) +
+#     geom_line(data=NH, aes(x=Year, y=Price, col=State, linetype=DR)) +
+#   geom_line(data=NY[Year<=2002], aes(x=Year, y=Price, col=State)) +
+#     geom_line(data=NY, aes(x=Year, y=Price, col=State, linetype=DR)) +
+#   theme_solarized(light=F) +
+#   ggtitle("Northeast Energy Prices, 1990-2014") + ylab("Price per kWh (cents)")
+#   
+```
+
+And I couldn't have been more wrong. Prices in 1990 in the Northeast were very tight, spreading out somewhat by the time the states started deregulating in 1998. And then things really went for a ride, ending in a very large price spread in 2014. The one control state, Vermont, performed as expected with a consistent rise in prices across the entire period.
+
+Of course there are a hundred other factors affecting why energy prices change differently state by state other than the structuring of the markets and I can't say whether deregulation has benefitted or harmed consumers in any of these states. However, we do have a certain trend in the states that deregulated and stayed that way.
+
+Next post, I will compare the price shifting in some deregulated states to the prices of primary energy sources.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
