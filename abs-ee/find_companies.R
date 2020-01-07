@@ -1,5 +1,5 @@
 #Create table w/ deal name, CIK, link to deal page
-#Run once per month to update with new companies
+#Run to update with new companies
 library(data.table); library(rvest)
 
 ###
@@ -56,7 +56,7 @@ change <- companies[!cik %in% companies_current$cik]
 
 if(nrow(change)>0){
   action <- paste0("New companies added: ", nrow(change))
-  new_comps <- paste0(change$Company, collapse = "; ")
+  new_comps <- paste0(change$cik, collapse = "; ")
 } else {
   action <- "Nothing added"
   new_comps <- ""
