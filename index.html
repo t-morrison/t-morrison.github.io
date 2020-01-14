@@ -31,9 +31,10 @@
     		</ul>
 		</nav>
 		<div> 
+			<br>
 			Welcome to Tommy's portfolio. <br> <br>
-			The network graph below represents various projects I've done linked by the technology used in them. <br><br>
-			This includes a mix of personal and professional projects. <br> <br>
+			The data-driven visualization below shows a selection of personal and professional projects. <br><br>
+			They are linked by the predominent tech used in each one. <br> <br>
 			Hover over the circles for info and click on them to view the projects.
 		</div>
 		
@@ -302,7 +303,12 @@
 					.attr("y", 4)
 					.style("text-anchor", "middle")
 					.html(function(d){ return ''+d.name+'' })
-					//.html(function(d){ return '<a href="'+d.path+'" target="_blank">' +d.name+'</a>' })
+					//.call(d3.drag()
+					   //.on("start", dragstarted)
+					   //.on("drag", dragged2)
+					   //.on("end", dragended)
+					//) 
+					
 				
 				d3.selectAll('.circle').append('circle')
 					  .attr("r", function(d){ return size(d.coolness)})
@@ -312,6 +318,10 @@
 					  .style("fill-opacity", 1)
 					  .attr("stroke", "black")
 					  .style("stroke-width", 1)
+					  //.call(d3.drag()
+					  //   .on("start", dragstarted)
+					  //   .on("drag", dragged)
+					  //   .on("end", dragended)) 
 					  .on("mouseover", function(d){
 							Tooltip
 								.style("opacity", 1)
@@ -358,7 +368,7 @@
 					.force("charge", d3.forceManyBody()
 						.strength(-400)
 						.theta(0.1)
-						.distanceMax(350)
+						.distanceMax(250)
 					)//.strength(.1)) // Nodes are attracted one each other of value is > 0
 					.velocityDecay(0.9)
 					.force("collide", d3.forceCollide().strength(1).radius(60).iterations(1)) // Force that avoids circle overlapping
@@ -409,9 +419,18 @@
 				}
 				function dragended(d) {
 					if (!d3.event.active) simulation.alphaTarget(.03);
-					d.fx = null;
-					d.fy = null;
+					console.log('drag over')
+					d.fx = d3.event.x;//null;
+					d.fy = d3.event.y;//null;
+					
+					
+					setTimeout(function (){
+						simulation.stop()
+					}, 000);
+					
 				}
+				
+				
 		//=================================================================================================
 		//=================================================================================================
 		
