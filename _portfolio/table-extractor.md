@@ -1,6 +1,6 @@
 ---
 title: "PDF Table Extractor"
-excerpt: "Open data utility tool <br/><img src='/images/table-extractor-1.png'>"
+excerpt: "Open data utility tool <br/><img src='/images/table-extractor-1.PNG'>"
 collection: portfolio
 ---
 
@@ -12,7 +12,7 @@ I came up with the idea for this app while designing a data collection project t
 each table had the same information but formats varied widely and the specific table we were after might be anywhere in a larger document, with a number of other tables mixed throughout. This meant the out-of-the-box Tabula
 software wouldn't work well - while it does a great job getting the data out, using it in a batch process would create just as much of a mess sorting the extracted data into our standardized format.
 
-<div style="text-align:center"><img src="/images/table-extractor-1.png" /></div>
+<div style="text-align:center"><img src="/images/table-extractor-1.PNG" /></div>
 <br>
 
 I needed something I could hand off to our researchers to maximize both their accuracy and efficiency. To me, that meant a side-by-side interface: target PDF on one side, to locate the correct table and see the original data,
