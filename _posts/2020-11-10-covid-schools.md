@@ -1,5 +1,5 @@
 ---
-title: "COVID-19 in U.S. Schools(' websites)"
+title: "COVID-19 in U.S. Schools[' websites]"
 author: TRM
 date: November 8, 2020
 output:
@@ -24,7 +24,7 @@ My first scrape of the data was around late August, then I did it weekly for abo
 How many public school district websites had a hit for any of our keywords on their front page each time we scraped the data? I chose 28 keywords that I thought captured a wide range of COVID-related topics relevant to a school. Note in the chart that the bars represent, chronologically, a single date for when the website was checked, but they are not at equal intervals.
 
 <table><tr><td>
-    <img src="/post-images/covid-school/plot1.PNG" />
+    <img src="/post-images/covid-school/plot1.png" />
 </td></tr></table>
 
 The two aspects of this imperfect analysis that seem worthwhile to me are 1) the percent of schools with a certain keyword hit and 2) the trend of certain keywords on a page.
