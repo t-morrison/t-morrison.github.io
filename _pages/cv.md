@@ -41,6 +41,7 @@ Skills
 * Google Analytics
 * Docker
 * SQL
+* MongoDB
 * Git/Github
 * Spanish
 
