@@ -18,6 +18,8 @@ I launched a new Twitter account last week: [@GreenGridUSA](https://twitter.com/
 
 Currently, @GreenGridUSA posts a daily update on how much utility-level power generation came from wind and solar power plants the prior day. This data is available [here](https://www.eia.gov/beta/electricity/gridmonitor/dashboard/electric_overview/US48/US48) on the hourly electric grid monitor, with about a twelve hour delay for this dataset.
 
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Utility level renewable power generation for 2/3/2021 (US lower 48):<br>Solar: 210,387 MWh (1.8%)<br>Wind: 1,373,001 MWh (12.0%)<br><br>Source: EIA, form EIA-930 <a href="https://t.co/5yeMBPDSpd">pic.twitter.com/5yeMBPDSpd</a></p>&mdash; Green Grid USA (@GreenGridUSA) <a href="https://twitter.com/GreenGridUSA/status/1357403906872066049?ref_src=twsrc%5Etfw">February 4, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+
 <table><tr><td align="center">
     <img src="/post-images/greengridusa/image2.PNG" />
 </td></tr></table>
