@@ -9,16 +9,18 @@ editor_options:
   chunk_output_type: console
 ---
 
-I launched a new Twitter account last week: [@GreenGridUSA](https://twitter.com/GreenGridUSA) (feel free to follow)! This is an automated Twitter bot that parses data and posts insights from the U.S. Energy Information Administration (EIA) data portal. The EIA has a ton of in-depth and timely data on the US electric grid, including on power plants, transmission, power demand and power generation, and I wanted to put something together using it.
+I launched a new Twitter account last week: [@GreenGridUSA](https://twitter.com/GreenGridUSA)! This is an automated Twitter bot that parses data and posts insights from the U.S. Energy Information Administration (EIA) data portal. The EIA has a ton of in-depth and timely data on the US electric grid, including on power plants, transmission, power demand and power generation, and I wanted to put something together using it.
 
 <table><tr><td align="center">
     <img src="/post-images/greengridusa/image1.PNG" />
 </td></tr></table>
 
-<img src="/post-images/greengridusa/image1.PNG" />
-
 
 Currently, @GreenGridUSA posts a daily update on how much utility-level power generation came from wind and solar power plants the prior day. This data is available [here](https://www.eia.gov/beta/electricity/gridmonitor/dashboard/electric_overview/US48/US48) on the hourly electric grid monitor, with about a twelve hour delay for this dataset.
+
+<table><tr><td align="center">
+    <img src="/post-images/greengridusa/image2.PNG" />
+</td></tr></table>
 
 I plan to add in a monthly and perhaps weekly review with some more detailed analysis of the green grid, perhaps drilling down by region or balancing authority. But I need to do a little research first to find out what might be worthwhile to look into. Beyond that, I'll look into combining the EIA data with some other data sources to make this 
 
