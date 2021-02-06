@@ -20,9 +20,6 @@ Currently, @GreenGridUSA posts a daily update on how much utility-level power ge
 
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Utility level renewable power generation for 2/3/2021 (US lower 48):<br>Solar: 210,387 MWh (1.8%)<br>Wind: 1,373,001 MWh (12.0%)<br><br>Source: EIA, form EIA-930 <a href="https://t.co/5yeMBPDSpd">pic.twitter.com/5yeMBPDSpd</a></p>&mdash; Green Grid USA (@GreenGridUSA) <a href="https://twitter.com/GreenGridUSA/status/1357403906872066049?ref_src=twsrc%5Etfw">February 4, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
 
-<table><tr><td align="center">
-    <img src="/post-images/greengridusa/image2.PNG" />
-</td></tr></table>
 
 I plan to add in a monthly and perhaps weekly review with some more detailed analysis of the green grid, perhaps drilling down by region or balancing authority. But I need to do a little research first to find out what might be worthwhile to look into. Beyond that, I'll look into combining the EIA data with some other data sources.
 
