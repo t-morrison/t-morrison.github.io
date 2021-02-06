@@ -9,15 +9,14 @@ editor_options:
   chunk_output_type: console
 ---
 
-I launched [@GreenGridUSA](https://twitter.com/GreenGridUSA) last week (feel free to follow)! This is an automated Twitter bot that parses data and posts insights from the U.S. Energy Information Administration (EIA). The EIA has a ton of in-depth and timely data on the US electric grid, including on power plants, transmission, power demand and power generation, and I wanted to put something together to bring that data out.
+I launched a new Twitter account last week: [@GreenGridUSA](https://twitter.com/GreenGridUSA) (feel free to follow)! This is an automated Twitter bot that parses data and posts insights from the U.S. Energy Information Administration (EIA) data portal. The EIA has a ton of in-depth and timely data on the US electric grid, including on power plants, transmission, power demand and power generation, and I wanted to put something together using it.
 
-<table><tr><td>
+<table><tr><td align="center">
     <img src="/post-images/greengridusa/image1.PNG" />
 </td></tr></table>
 
-<table><tr><td>
-    <img src="/post-images/covid-school/plot1.png" />
-</td></tr></table>
+<img src="/post-images/greengridusa/image1.PNG" />
+
 
 Currently, @GreenGridUSA posts a daily update on how much utility-level power generation came from wind and solar power plants the prior day. This data is available [here](https://www.eia.gov/beta/electricity/gridmonitor/dashboard/electric_overview/US48/US48) on the hourly electric grid monitor, with about a twelve hour delay for this dataset.
 
