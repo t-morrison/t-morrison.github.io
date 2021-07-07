@@ -8,4 +8,4 @@ I created this game while learning D3.js, a javascript library for online data v
 
 Test your geography skills against the clock to save the world. Built from scratch with javascript and D3.js.
 
-[moman822.github.io/files/IronDomeGame.html](https://moman822.github.io/files/IronDomeGame.html)
+[t-morrison.github.io/files/IronDomeGame.html](https://t-morrison.github.io/files/IronDomeGame.html)
