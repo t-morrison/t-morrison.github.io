@@ -38,6 +38,11 @@ And now, this shortcut is available in my own R package, `viewDat`, available on
 
 I have the shortcut bound to `Ctrl + ,`. It was not otherwise occupied and easy to reach. The shortcut won't currently work on piped queries wrapping multiple lines, but could probably be extended with some extra effort (I don't use pipes much, so haven't gotten to this). Give it a try!
 
+Check it out in-action:
+
+             |
+:-------------------------:|
+![](/post-images/rstudio-shortcut/gif1.gif)|
 
 
 
