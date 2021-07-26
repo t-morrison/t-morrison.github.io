@@ -40,10 +40,9 @@ I have the shortcut bound to `Ctrl + ,`. It was not otherwise occupied and easy 
 
 Check it out in-action:
 
-             |
-:-------------------------:|
-![](/post-images/rstudio-shortcut/gif1.gif)|
-
+<table><tr><td>
+    <img src="/post-images/rstudio-shortcut/gif1.gif" />
+</td></tr></table>
 
 
 
