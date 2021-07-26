@@ -21,7 +21,7 @@ What you see             |  Is not what you get
 ![what you see](/post-images/rstudio-shortcut/no-2.PNG)  |  ![what you get](/post-images/rstudio-shortcut/no-2_2.PNG)
 
 
-For the built-in RStudio shortcuts, they just grab `iris` and open it in the Viewer, ignoring the rest of the query.
+For the built-in RStudio shortcuts, they just grab `iris` and open it in the Viewer, ignoring the rest of the query (note the presence of *setosa* in the right panel where the query filters for *virginica*).
 
 My shortcut, on the other hand, wraps the entire line in `View()`, using RStudio's API functions, and returns the whole dang query in the Viewer. As someone who does most of their work with `data.table`, this is extremely helpful for the long transformations that don't wrap lines:
 
@@ -30,10 +30,13 @@ What you see             |  Is what you get!
 :-------------------------:|:-------------------------:
 ![what you see](/post-images/rstudio-shortcut/no-3.PNG)  |  ![what you get](/post-images/rstudio-shortcut/no-3_2.PNG)
 
+You can see the query that is run in the console at bottom.
 
-And now, this shortcut is available in my own R package, `viewDat`, available here: https://github.com/t-morrison/viewDat
+## Try it yourself
 
-I have the shortcut bound to `Ctrl + ,`, which not otherwise occupied and easy to reach. The shortcut won't currently work on piped queries, but could probably be extended with some extra effort (I don't use pipes much, so haven't gotten to this).
+And now, this shortcut is available in my own R package, `viewDat`, available on Github: [github.com/t-morrison/viewDat](https://github.com/t-morrison/viewDat)
+
+I have the shortcut bound to `Ctrl + ,`. It was not otherwise occupied and easy to reach. The shortcut won't currently work on piped queries wrapping multiple lines, but could probably be extended with some extra effort (I don't use pipes much, so haven't gotten to this). Give it a try!
 
 
 
